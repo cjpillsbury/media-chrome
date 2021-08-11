@@ -280,8 +280,6 @@ class MediaController extends MediaContainer {
       unassociateElement,
     );
 
-    console.log('constructor', this.childNodes);
-
     els.push({ element, unsubscribe });
   }
 
