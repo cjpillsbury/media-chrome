@@ -10,10 +10,6 @@ class MediaDurationDisplay extends MediaTextDisplay {
     return [MediaUIAttributes.MEDIA_DURATION];
   }
 
-  connectedCallback() {
-    this.setAttribute(MediaUIAttributes.MEDIA_CHROME_ATTRIBUTES, this.constructor.observedAttributes.join(' '));
-  }
-
   attributeChangedCallback(_attrName, _oldValue, newValue) {
     this.container.innerHTML = formatTime(newValue);
   }

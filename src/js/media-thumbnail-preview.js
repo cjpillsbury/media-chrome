@@ -41,11 +41,7 @@ class MediaThumbnailPreviewElement extends window.HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
-  connectedCallback() {
-    this.setAttribute(MediaUIAttributes.MEDIA_CHROME_ATTRIBUTES, this.constructor.observedAttributes.join(' '));
-  }
-
-  attributeChangedCallback(attrName, _oldValue, newValue) {
+  attributeChangedCallback(_attrName, _oldValue, _newValue) {
     this.update();
   }
 

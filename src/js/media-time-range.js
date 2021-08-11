@@ -88,11 +88,6 @@ class MediaTimeRange extends MediaChromeRange {
     this.enableThumbnails();
   }
 
-  connectedCallback() {
-    this.setAttribute(MediaUIAttributes.MEDIA_CHROME_ATTRIBUTES, this.constructor.observedAttributes.join(' '));
-  }
-
-
   attributeChangedCallback(attrName, _oldValue, newValue) {
     if (attrName === MediaUIAttributes.MEDIA_CURRENT_TIME) {
       this.range.value = +newValue;

@@ -22,10 +22,6 @@ class MediaPlaybackRateButton extends MediaChromeButton {
     this.nativeEl.innerHTML = `${DEFAULT_RATE}x`;
   }
 
-  connectedCallback() {
-    this.setAttribute(MediaUIAttributes.MEDIA_CHROME_ATTRIBUTES, this.constructor.observedAttributes.join(' '));
-  }
-
   attributeChangedCallback(attrName, _oldValue, newValue) {
     if (attrName === 'rates') {
       // This will:

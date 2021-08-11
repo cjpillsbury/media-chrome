@@ -28,10 +28,6 @@ class MediaVolumeRange extends MediaChromeRange {
     });
   }
 
-  connectedCallback() {
-    this.setAttribute(MediaUIAttributes.MEDIA_CHROME_ATTRIBUTES, this.constructor.observedAttributes.join(' '));
-  }
-
   attributeChangedCallback(_attrName, _oldValue, _newValue) {
     const newVolume = toVolume(this);
     this.range.value = newVolume;
