@@ -296,7 +296,7 @@ class MediaController extends MediaContainer {
   }
 
   associateElement(el) {
-    if (!el) return;
+    if (!el || el === this) return;
     const els = this.associatedElements;
     const index = els.indexOf(el);
     if (index > -1) return;
