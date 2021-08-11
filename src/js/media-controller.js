@@ -215,12 +215,6 @@ class MediaController extends MediaContainer {
     this.associateElement(this);
   }
 
-  connectedCallback() {
-    const addedNodes = getMediaUIElementDescendants(this);
-    addedNodes.forEach(this.associateElement.bind(this));
-    super.connectedCallback();
-  }
-
   mediaSetCallback(media) {
     // Might wait for custom media el to be ready
     if (!super.mediaSetCallback(media)) return;
@@ -276,12 +270,8 @@ class MediaController extends MediaContainer {
     const els = this.monitoredElements;
     if (els.some(elObj => elObj.element === element)) return;
 
-    const mediaUIElementDescendants = getMediaUIElementDescendants(element);
-
     const associateElement = this.associateElement.bind(this);
     const unassociateElement = this.unassociateElement.bind(this);
-
-    mediaUIElementDescendants.forEach(associateElement);
 
     /** @TODO Should we support "removing association" */
     const unsubscribe = monitorMediaUIElementDescendantsOf(
@@ -289,6 +279,8 @@ class MediaController extends MediaContainer {
       associateElement, 
       unassociateElement,
     );
+
+    console.log('constructor', this.childNodes);
 
     els.push({ element, unsubscribe });
   }
@@ -300,12 +292,6 @@ class MediaController extends MediaContainer {
     const index = els.findIndex(elObj => elObj.element === element);
     if (index < 0) return;
 
-    const mediaUIElementDescendants = getMediaUIElementDescendants(element);
-
-    const unassociateElement = this.unassociateElement.bind(this);
-
-    mediaUIElementDescendants.forEach(unassociateElement);
-    
     const { unsubscribe } = els[index];
     unsubscribe();
     els.splice(index, 1);
@@ -457,6 +443,51 @@ const shouldGetMediaUIElementDescendants = (el) => {
   return !isMediaSlotElement(el) && hasDescendants(el);
 };
 
+/*
+function propagateMediaState(nodeList, stateName, val) {
+  Array.from(nodeList).forEach(child => {
+    // All elements we care about at least have an empty children list (i.e. not <style>)
+    if (!child.children) return;
+
+    const childName = child.nodeName.toLowerCase();
+
+    // Don't propagate into media elements, UI can't live in <video>
+    // so just avoid potential conflicts
+    if (child.slot === 'media') return;
+
+    function setAndPropagate() {
+      // Only set if previously defined, at least as null
+      // This is how element authors can tell us they want to
+      // receive these state updates
+      if (typeof child[stateName] !== 'undefined') {
+        child[stateName] = val;
+      }
+
+      propagateMediaState(child.children, stateName, val);
+
+      // We might consider an option to block piercing the shadow dom
+      if (child.shadowRoot) propagateMediaState(child.shadowRoot.childNodes, stateName, val);
+    }
+
+    // Make sure custom els are ready
+    if (childName.includes('-') && !window.customElements.get(childName)) {
+      window.customElements.whenDefined(childName).then(setAndPropagate);
+    } else {
+      setAndPropagate();
+    }
+  });
+ */
+
+const isUndefinedCustomElement = (el) => {
+  const name = el?.nodeName.toLowerCase();
+  return name.includes('-') && !window.customElements.get(name);
+};
+
+const getRegisteredCustomElementPromise = (el) => {
+  const name = el?.nodeName.toLowerCase();
+  return window.customElements.whenDefined(name).then(() => el);
+};
+
 /**
  * 
  * @description This function will recursively check for any descendants (including the root node) 
@@ -468,6 +499,10 @@ const shouldGetMediaUIElementDescendants = (el) => {
  *  - Have a `media-chrome-attributes` attribute with at least one well-defined media chrome attribute
  */
 const getMediaUIElementDescendants = (rootNode) => {
+  // If the rootNode is a custom element that's not yet defined/ready, so return an array of a promise to yield the
+  // element once it's registered for us to check at that time.
+  if (isUndefinedCustomElement(rootNode)) return [getRegisteredCustomElementPromise(rootNode)];
+
   const rootMediaUIElements = isMediaUIElement(rootNode) && !isMediaSlotElementDescendant(rootNode) ? [rootNode] : [];
   // If it's a leaf node/element, if it's also a media ui element, return an array containing it as the sole member,
   // otherwise return an empty array.
@@ -532,16 +567,58 @@ const propagateMediaState = (els, stateName, val) => {
   });
 };
 
+const isPromiseLike = value => typeof value?.then === 'function';
+const isHTMLElement = value => value instanceof window.HTMLElement;
+
 const monitorMediaUIElementDescendantsOf = (root, associateCallback, unassociateCallback) => {
+
+  const associateCallbackWithAsync = (elOrPromise) => {
+    // Use structural type checking for "`then`" based on A+/Promise spec in case of 3rd party Promise impls or similar
+    // But also make sure it isn't an `HTMLElement`, just in case it happens to have a `then` method
+    if (isPromiseLike(elOrPromise) && !isHTMLElement(elOrPromise)) {
+      // Assume promises will yield the element when resolved
+      elOrPromise.then(el => {
+        const addedNodes = getMediaUIElementDescendants(el);
+        // Still use `associateCallbackWithAsync`, just in case more descendants aren't quite ready
+        addedNodes.forEach(associateCallbackWithAsync);
+      });
+      return;
+    }
+
+    associateCallback(elOrPromise);
+  };
+
+  const addedNodes = getMediaUIElementDescendants(root);
+  addedNodes.forEach(associateCallbackWithAsync);
+
+  /** @TODO Discuss recursively (un)associating or not, recursively monitoring or not, etc. for event use case (CJP) */
+  const associateElementHandler = (evt) => {
+    const el = evt?.composedPath()[0] ?? evt.target;
+    associateCallback(el);
+  };
+
+  const unassociateElementHandler = (evt) => {
+    const el = evt?.composedPath()[0] ?? evt.target;
+    unassociateCallback(el);
+  };
+
+  root.addEventListener(MediaUIEvents.MEDIA_ASSOCIATE_ELEMENT_REQUEST, associateElementHandler);
+  root.addEventListener(MediaUIEvents.MEDIA_UNASSOCIATE_ELEMENT_REQUEST, unassociateElementHandler);
+
   const mutationCallback = (mutationsList, _observer) => {
     const { addedNodes, removedNodes } = toNextMediaUIElementsState(mutationsList);
-    addedNodes.forEach(associateCallback);
+    addedNodes.forEach(associateCallbackWithAsync);
     removedNodes.forEach(unassociateCallback);
   };
 
   const observer = new MutationObserver(mutationCallback);
   observer.observe(root, { childList: true, attributes: true, subtree: true });
-  return () => observer.disconnect();
+
+  return () => {
+    observer.disconnect();
+    root.removeEventListener(MediaUIEvents.MEDIA_ASSOCIATE_ELEMENT_REQUEST, associateElementHandler);
+    root.removeEventListener(MediaUIEvents.MEDIA_UNASSOCIATE_ELEMENT_REQUEST, unassociateElementHandler);
+  };
 };
 
 defineCustomElement('media-controller', MediaController);
