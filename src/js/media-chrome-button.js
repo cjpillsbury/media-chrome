@@ -43,19 +43,18 @@ template.innerHTML = `
 
   /* Undo the default button styles and fill the parent element */
   button {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    // right: 0px;
+    // left: 0px;
     width: 100%;
-    vertical-align: middle;
+    height: 100%;
     border: none;
     margin: 0;
     padding: 0;
     text-decoration: none;
     background: transparent;
-    color: #ffffff;
-    font-family: sans-serif;
-    font-size: 14px;
-    line-height: 24px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
     cursor: pointer;
     text-align: center;
     -webkit-appearance: none;
@@ -69,6 +68,7 @@ template.innerHTML = `
   button:active {}
 
   svg, img, ::slotted(svg), ::slotted(img) {
+    vertical-align: middle;
     width: var(--media-button-icon-width, 24px);
     height: var(--media-button-icon-height);
     transform: var(--media-button-icon-transform);
@@ -98,11 +98,10 @@ class MediaChromeButton extends window.HTMLElement {
       slotTemplate.innerHTML = `<slot>${options.defaultContent || ''}</slot>`;
     }
 
-    this.nativeEl.appendChild(slotTemplate.content.cloneNode(true));
-
     shadow.appendChild(buttonHTML);
+    shadow.appendChild(slotTemplate.content.cloneNode(true));
 
-    this.addEventListener('click', e => {
+    this.nativeEl.addEventListener('click', e => {
       this.handleClick(e);
     });
   }

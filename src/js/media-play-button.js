@@ -34,6 +34,16 @@ class MediaPlayButton extends MediaChromeButton {
 
   constructor(options={}) {
     super({ slotTemplate, ...options });
+    
+    const resizeBorderBoxObserver = new ResizeObserver((entries) => {
+      Array.prototype.forEach.call(entries, entry => console.log('RESIZE BORDER BOX ENTRY', entry));
+    });
+    resizeBorderBoxObserver.observe(this, { box: 'border-box' });
+    
+    const resizeContentBoxObserver = new ResizeObserver((entries) => {
+      Array.prototype.forEach.call(entries, entry => console.log('RESIZE CONTENT BOX ENTRY', entry));
+    });
+    resizeContentBoxObserver.observe(this, { box: 'content-box' });
   }
 
   connectedCallback() {
