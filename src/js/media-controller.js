@@ -441,41 +441,6 @@ const shouldGetMediaUIElementDescendants = (el) => {
   return !isMediaSlotElement(el) && hasDescendants(el);
 };
 
-/*
-function propagateMediaState(nodeList, stateName, val) {
-  Array.from(nodeList).forEach(child => {
-    // All elements we care about at least have an empty children list (i.e. not <style>)
-    if (!child.children) return;
-
-    const childName = child.nodeName.toLowerCase();
-
-    // Don't propagate into media elements, UI can't live in <video>
-    // so just avoid potential conflicts
-    if (child.slot === 'media') return;
-
-    function setAndPropagate() {
-      // Only set if previously defined, at least as null
-      // This is how element authors can tell us they want to
-      // receive these state updates
-      if (typeof child[stateName] !== 'undefined') {
-        child[stateName] = val;
-      }
-
-      propagateMediaState(child.children, stateName, val);
-
-      // We might consider an option to block piercing the shadow dom
-      if (child.shadowRoot) propagateMediaState(child.shadowRoot.childNodes, stateName, val);
-    }
-
-    // Make sure custom els are ready
-    if (childName.includes('-') && !window.customElements.get(childName)) {
-      window.customElements.whenDefined(childName).then(setAndPropagate);
-    } else {
-      setAndPropagate();
-    }
-  });
- */
-
 const isUndefinedCustomElement = (el) => {
   const name = el?.nodeName.toLowerCase();
   return name.includes('-') && !window.customElements.get(name);
