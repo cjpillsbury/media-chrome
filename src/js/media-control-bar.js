@@ -55,20 +55,20 @@ class MediaControlBar extends window.HTMLElement {
   attributeChangedCallback(attrName, oldValue, newValue) {
     if (attrName === MediaUIAttributes.MEDIA_CONTROLLER) {
       if (oldValue) {
-        const mediaControllerEl = getElementBySelectorOrId(oldValue, attrName);
+        const mediaControllerEl = document.getElementById(mediaControllerId);
         mediaControllerEl?.unassociateDescendantsOf?.(this);
       }
       if (newValue) {
-        const mediaControllerEl = getElementBySelectorOrId(newValue, attrName);
+        const mediaControllerEl = document.getElementById(mediaControllerId);
         mediaControllerEl?.associateDescendantsOf?.(this);
       }
     }
   }
 
   connectedCallback() {
-    const mediaControllerSelector = this.getAttribute(MediaUIAttributes.MEDIA_CONTROLLER);
-    if (mediaControllerSelector) {
-      const mediaControllerEl = getElementBySelectorOrId(mediaControllerSelector, MediaUIAttributes.MEDIA_CONTROLLER);
+    const mediaControllerId = this.getAttribute(MediaUIAttributes.MEDIA_CONTROLLER);
+    if (mediaControllerId) {
+      const mediaControllerEl = document.getElementById(mediaControllerId);
       mediaControllerEl?.associateDescendantsOf?.(this);
     }
   }
@@ -76,7 +76,7 @@ class MediaControlBar extends window.HTMLElement {
   disconnectedCallback() {
     const mediaControllerSelector = this.getAttribute(MediaUIAttributes.MEDIA_CONTROLLER);
     if (mediaControllerSelector) {
-      const mediaControllerEl = getElementBySelectorOrId(mediaControllerSelector, MediaUIAttributes.MEDIA_CONTROLLER);
+      const mediaControllerEl = document.getElementById(mediaControllerId);
       mediaControllerEl?.unassociateDescendantsOf?.(this);
     }
   }
