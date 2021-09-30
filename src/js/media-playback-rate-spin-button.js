@@ -34,6 +34,9 @@ class MediaPlaybackRateSpinButton extends MediaChromeButton {
       const { key } = e;
       if (!SpinPressKeyValues.includes(key)) return;
 
+      e.stopPropagation();
+      e.preventDefault();
+
       const currentRate = (+this.getAttribute(MediaUIAttributes.MEDIA_PLAYBACK_RATE) || DEFAULT_RATE);
       let nextRate;
       if (key === SpinPressKeys.ARROW_UP) {
@@ -45,8 +48,6 @@ class MediaPlaybackRateSpinButton extends MediaChromeButton {
       } else if (key === SpinPressKeys.HOME) {
         nextRate = this._rates[this._rates.length - 1] ?? DEFAULT_RATE;
       }
-
-      console.log('key', key);
 
       const evt = new window.CustomEvent(MediaUIEvents.MEDIA_PLAYBACK_RATE_REQUEST, { composed: true, bubbles: true, detail: nextRate });
       this.dispatchEvent(evt);
