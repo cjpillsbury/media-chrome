@@ -153,6 +153,7 @@ class MediaContainer extends window.HTMLElement {
   }
 
   mediaSetCallback(media) {
+    // nullish, so definitely not a media element; no need to wait
     if (!media) {
       console.error('<media-chrome>: Media element set with slot="media" does not appear to be compatible.', media);
       return Promise.reject(media);
@@ -181,6 +182,7 @@ class MediaContainer extends window.HTMLElement {
       return window.customElements.whenDefined(mediaName).then(() => {
         if (!media.play) {
           console.error('<media-chrome>: Media element set with slot="media" does not appear to be compatible.', media);
+          // Waited but still not a media element.
           return Promise.reject(media);
         }
 
@@ -190,6 +192,7 @@ class MediaContainer extends window.HTMLElement {
     }
 
     setupMedia(media);
+    // Confirmed a media element; no need to wait
     return Promise.resolve(media);
   }
 
