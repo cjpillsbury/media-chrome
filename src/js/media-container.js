@@ -153,37 +153,48 @@ class MediaContainer extends window.HTMLElement {
   }
 
   mediaSetCallback(media) {
-    // Should only ever be set with a compatible media element, never null
-    if (!media || !media.play) {
+    if (!media) {
       console.error('<media-chrome>: Media element set with slot="media" does not appear to be compatible.', media);
-      return false;
+      return Promise.reject(media);
     }
 
-    // Wait until custom media elements are ready
-    const mediaName = media.nodeName.toLowerCase();
+    const setupMedia = media => {
+      // Toggle play/pause with clicks on the media element itself
+      this._mediaClickPlayToggle = e => {
+        const eventName = media.paused
+          ? MediaUIEvents.MEDIA_PLAY_REQUEST
+          : MediaUIEvents.MEDIA_PAUSE_REQUEST;
+        this.dispatchEvent(new window.CustomEvent(eventName, { composed: true, bubbles: true }));
+      }
+      media.addEventListener('click', this._mediaClickPlayToggle, false);
+    }
 
-    if (mediaName.includes('-') && !window.customElements.get(mediaName)) {
-      window.customElements.whenDefined(mediaName).then(()=>{
-        this.mediaSetCallback(media);
+    if (!media.play) {
+      const mediaName = media.nodeName.toLowerCase();
+      // Not a custom media element; no need to wait
+      if (!mediaName.includes('-')) {
+        console.error('<media-chrome>: Media element set with slot="media" does not appear to be compatible.', media);
+        return Promise.reject(media);
+      }
+
+      // Wait until custom media elements are ready
+      return window.customElements.whenDefined(mediaName).then(() => {
+        if (!media.play) {
+          console.error('<media-chrome>: Media element set with slot="media" does not appear to be compatible.', media);
+          return Promise.reject(media);
+        }
+
+        setupMedia(media);
+        return Promise.resolve(media);
       });
-      return false;
     }
 
-    // Toggle play/pause with clicks on the media element itself
-    this._mediaClickPlayToggle = e => {
-
-      const eventName = media.paused
-        ? MediaUIEvents.MEDIA_PLAY_REQUEST
-        : MediaUIEvents.MEDIA_PAUSE_REQUEST;
-      this.dispatchEvent(new window.CustomEvent(eventName, { composed: true, bubbles: true }));
-    }
-    media.addEventListener('click', this._mediaClickPlayToggle, false);
-
-    return true;
+    setupMedia(media);
+    return Promise.resolve(media);
   }
 
   mediaUnsetCallback(media) {
-    media.removeEventListener('click', this._mediaClickPlayToggle);
+    media?.removeEventListener('click', this._mediaClickPlayToggle);
   }
 
   connectedCallback() {

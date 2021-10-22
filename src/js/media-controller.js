@@ -260,40 +260,41 @@ class MediaController extends MediaContainer {
   }
 
   mediaSetCallback(media) {
-    // Might wait for custom media el to be ready
-    if (!super.mediaSetCallback(media)) return;
+    const setupMedia = (media) => {
+      // Listen for media state changes and propagate them to children and associated els
+      Object.keys(this._mediaStatePropagators).forEach((key) => {
+        const events = key.split(',');
+        const handler = this._mediaStatePropagators[key];
 
-    // Listen for media state changes and propagate them to children and associated els
-    Object.keys(this._mediaStatePropagators).forEach((key) => {
-      const events = key.split(',');
-      const handler = this._mediaStatePropagators[key];
+        events.forEach((event) => {
+          // If this is fullscreen apply to the document
+          const target = (event == fullscreenApi.event) ? this.getRootNode() : media;
 
-      events.forEach((event) => {
-        // If this is fullscreen apply to the document
-        const target = (event == fullscreenApi.event) ? this.getRootNode() : media;
-
-        target.addEventListener(event, handler);
+          target.addEventListener(event, handler);
+        });
+        handler();
       });
-      handler();
-    });
 
-    Object.entries(this._textTrackMediaStatePropagators).forEach(([eventsStr, handler]) => {
-      const events = eventsStr.split(',');
-      events.forEach((event) => {
-        media.textTracks.addEventListener(event, handler);
+      Object.entries(this._textTrackMediaStatePropagators).forEach(([eventsStr, handler]) => {
+        const events = eventsStr.split(',');
+        events.forEach((event) => {
+          media.textTracks.addEventListener(event, handler);
+        });
+        handler();
       });
-      handler();
-    });
 
-    // Update the media with the last set volume preference
-    // This would preferably live with the media element,
-    // not a control.
-    try {
-      const volPref = window.localStorage.getItem('media-chrome-pref-volume');
-      if (volPref !== null) media.volume = volPref;
-    } catch (e) {
-      console.debug('Error getting volume pref', e);
+      // Update the media with the last set volume preference
+      // This would preferably live with the media element,
+      // not a control.
+      try {
+        const volPref = window.localStorage.getItem('media-chrome-pref-volume');
+        if (volPref !== null) media.volume = volPref;
+      } catch (e) {
+        console.debug('Error getting volume pref', e);
+      }
     }
+    // Might wait for custom media el to be ready
+    return super.mediaSetCallback(media).then(setupMedia);
   }
 
   mediaUnsetCallback(media) {
