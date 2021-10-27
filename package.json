@@ -12,6 +12,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "snowpack build --config snowpack.prod.config.cjs",
+    "build:react": "node ./tools/react/build.js",
     "dev": "snowpack dev --config snowpack.dev.config.cjs",
     "start": "yarn dev",
     "test": "web-test-runner --coverage",
