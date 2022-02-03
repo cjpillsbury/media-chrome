@@ -1,43 +1,39 @@
+/*
+  <media-control-bar>
+
+  Auto position contorls in a line and set some base colors
+*/
 import { MediaUIAttributes } from './constants.js';
 import { defineCustomElement } from './utils/defineCustomElement.js';
 import {
   Window as window,
   Document as document,
 } from './utils/server-safe-globals.js';
-// Todo: Use data locals: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleTimeString
 
 const template = document.createElement('template');
 
 template.innerHTML = `
   <style>
     :host {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
+      /* Need position to display above video for some reason */
       box-sizing: border-box;
-      background-color: var(--media-control-background, rgba(20,20,30, 0.7));
-  
-      padding: 10px;
+      display: inline-flex;
 
-      font-size: 14px;
-      line-height: 18px;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      color: #ffffff;
-      pointer-events: auto;
+      color: var(--media-icon-color, #eee);
     }
 
-    #container {
-      /* NOTE: We don't currently have more generic sizing vars */
-      height: var(--media-text-content-height, auto);
+    media-time-range,
+    ::slotted(media-time-range),
+    ::slotted(media-progress-range),
+    ::slotted(media-clip-selector) {
+      flex-grow: 1;
     }
   </style>
-  <span id="container">
+
   <slot></slot>
-  </span>
 `;
 
-class MediaTextDisplay extends window.HTMLElement {
+class MediaControlBar extends window.HTMLElement {
   static get observedAttributes() {
     return [MediaUIAttributes.MEDIA_CONTROLLER];
   }
@@ -47,7 +43,6 @@ class MediaTextDisplay extends window.HTMLElement {
 
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.container = this.shadowRoot.querySelector('#container');
   }
 
   attributeChangedCallback(attrName, oldValue, newValue) {
@@ -84,6 +79,6 @@ class MediaTextDisplay extends window.HTMLElement {
   }
 }
 
-defineCustomElement('media-text-display', MediaTextDisplay);
+defineCustomElement('media-control-bar', MediaControlBar);
 
-export default MediaTextDisplay;
+export default MediaControlBar;
