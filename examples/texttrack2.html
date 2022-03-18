@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Media Chrome Advanced Video Usage Example</title>
+    <script type="module" src="../dist/index.js"></script>
+    <style></style>
+  </head>
+  <body>
+    <main>
+      <h1>Media Chrome Advanced Video Usage Example</h1>
+      <video
+        id="main-video"
+        src="./tears_of_steel_720p.mp4"
+        width="50%"
+        height="50%"
+        preload="auto"
+        muted
+        controls
+      ></video>
+
+      <video id="vtt-src-video">
+        <track
+          default
+          id="vtt-src"
+          label="English"
+          kind="captions"
+          srclang="en"
+          src="./vtt/en-cc.vtt"
+        />
+      </video>
+      <div class="examples">
+        <a href="./">View more examples</a>
+      </div>
+    </main>
+    <script>
+      const vidEl = document.querySelector('video#main-video');
+      const vttSrcVidEl = document.querySelector('video#vtt-src-video');
+      const trackEl = document.querySelector('track#vtt-src');
+      fetch(
+        'https://manifest-gce-us-east1-production.fastly.mux.com/kCINkDopXEBjW00fBgwytMmRd7j36702wIPvyp00hP00CPSGlMHsnP02BzUBTUJYTcfQHyuJ9i1UIL7A/subtitles.m3u8?expires=1648216800&signature=NjIzZGNhZTBfZmI3NmQ4MDk0MjMyY2JkZmZjMGFmODBkNmE2YmNiNjYxYWEwYjM0MmFjYjQ5YWRiNDEzYWNhYmMyZWMxNGU4OQ=='
+      )
+        .then((resp) => resp.text())
+        .then((playlistStr) => {
+          const urls = playlistStr
+            .split('\n')
+            .filter((lineStr) => lineStr && !lineStr.startsWith('#'));
+          return Promise.all(urls.map((url) => fetch(url)))
+            .then((resps) => Promise.all(resps.map((resp) => resp.text())))
+            .then((vttStrs) => {
+              return [
+                'WEBVTT',
+                ...vttStrs
+                  .map((vttStr) =>
+                    vttStr.split('\n').filter((vttLineStr) => {
+                      const trimmedLineStr = vttLineStr.trim();
+                      return !(
+                        trimmedLineStr.startsWith('WEBVTT') ||
+                        trimmedLineStr.startsWith('X-TIMESTAMP-MAP')
+                      );
+                    })
+                  )
+                  .flat(),
+              ].join('\n');
+            });
+        })
+        .then(console.log.bind(null, 'vtt\n\n\n'));
+      vttSrcVidEl.textTracks.addEventListener('change', () => {
+        // console.log(vidEl, trackEl.track.cues);
+        setTimeout(() => {
+          const srcTrack = trackEl.track;
+          console.log(vidEl, trackEl.track.cues);
+          // addTextTrack(kind: TextTrackKind, label?: string, language?: string): TextTrack;
+          const track = vidEl.addTextTrack(
+            srcTrack.kind,
+            srcTrack.label,
+            srcTrack.language
+          );
+          // track.mode = "showing";
+          Array.prototype.forEach.call(srcTrack.cues, (cue) => {
+            track.addCue(cue);
+          });
+          console.log(track);
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

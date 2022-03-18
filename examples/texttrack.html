@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Media Chrome Advanced Video Usage Example</title>
+    <script type="module" src="../dist/index.js"></script>
+    <style></style>
+  </head>
+  <body>
+    <main>
+      <h1>Media Chrome Advanced Video Usage Example</h1>
+      <video
+        id="main-video"
+        src="./tears_of_steel_720p.mp4"
+        width="50%"
+        height="50%"
+        preload="auto"
+        muted
+        controls
+      >
+        <track
+          default
+          id="main-track"
+          label="English"
+          kind="captions"
+          srclang="en"
+          src="./tears_of_steal_v3.vtt"
+        />
+      </video>
+
+      <!-- <video id="vtt-src-video">
+        <track
+          default
+          id="vtt-src"
+          label="English"
+          kind="captions"
+          srclang="en"
+          src="./tears_of_steal.vtt"
+        />
+      </video> -->
+      <div class="examples">
+        <a href="./">View more examples</a>
+      </div>
+    </main>
+    <script>
+      const vidEl = document.querySelector('video#main-video');
+      const trackEl = document.querySelector('track#main-track');
+      trackEl.addEventListener('cuechange', () =>
+        console.log('activeCues', ...Array.prototype.slice.call(trackEl.track.activeCues))
+      );
+      // const vttSrcVidEl = document.querySelector('video#vtt-src-video');
+      // const trackEl = document.querySelector('track#vtt-src');
+
+      // trackEl.addEventListener('load', () => {
+      //   const srcTrack = trackEl.track;
+      //   const track = vidEl.addTextTrack(
+      //     srcTrack.kind,
+      //     srcTrack.label,
+      //     srcTrack.language
+      //   );
+      //   // track.mode = "showing";
+      //   Array.prototype.forEach.call(srcTrack.cues, (cue) => {
+      //     track.addCue(cue);
+      //   });
+      // });
+    </script>
+  </body>
+</html>
