@@ -3,10 +3,10 @@ import { useMediaSelector } from 'media-chrome/react/media-store';
 import CurrentTimeDisplay from './CurrentTimeDisplay';
 import Seekbar from './Seekbar';
 import DurationDisplay from './DurationDisplay';
-import PlayButton from './PlayButton';
-import SeekBackwardButton from './SeekBackwardButton';
+import MUIMediaPlayButton from './PlayButton';
+import MUIMediaSeekBackwardButton from './SeekBackwardButton';
 import SeekForwardButton from './SeekForwardButton';
-import MuteButton from './MuteButton';
+import MUIMediaMuteButton from './MuteButton';
 import VolumeSlider from './VolumeSlider';
 import PlaybackRateMenuButton from './PlaybackRateMenuButton';
 import PipButton from './PipButton';
@@ -18,6 +18,9 @@ import AudioMenuButton from './AudioMenuButton';
 import TogglePausedGestureRegion from './TogglePausedGestureRegion';
 import SeekBackwardGestureRegion from './SeekBackwardGestureRegion';
 import SeekForwardGestureRegion from './SeekForwardGestureRegion';
+import MuteButton from '@/components/connected/MuteButton';
+import PlayButton from '@/components/connected/PlayButton';
+import SeekBackwardButton from '@/components/connected/SeekBackwardButton';
 
 /**
  * @description A mostly simple UI of control/display components integrated into the <MediaProvider/>'s MediaStore.
@@ -89,9 +92,12 @@ const ControlsContainer = () => {
       </Stack>
       <Stack direction="row" alignItems="center">
         <PlayButton />
+        <PlayButton component={MUIMediaPlayButton} />
         <SeekBackwardButton />
+        <SeekBackwardButton component={MUIMediaSeekBackwardButton} />
         <SeekForwardButton />
         <MuteButton />
+        <MuteButton component={MUIMediaMuteButton} />
         <VolumeSlider />
         {/* A horizontal spacer */}
         <Box sx={{ flexGrow: 1 }} />

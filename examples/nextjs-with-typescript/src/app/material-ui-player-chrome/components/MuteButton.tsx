@@ -2,11 +2,8 @@ import { IconButton, Tooltip } from '@mui/material';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeDownIcon from '@mui/icons-material/VolumeDown';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import {
-  useMediaDispatch,
-  useMediaSelector,
-  MediaActionTypes,
-} from 'media-chrome/react/media-store';
+import { MediaActionTypes } from 'media-chrome/react/media-store';
+// import { EventOrAction } from '../../../../../../dist/media-store/state-mediator';
 
 /**
  * In the future, we may add these
@@ -28,24 +25,27 @@ const VolumeIconComponentMap = {
   [VolumeLevel.LOW]: VolumeDownIcon,
   [VolumeLevel.OFF]: VolumeOffIcon,
   DEFAULT: VolumeOffIcon,
+} as const;
+
+type EventOrAction<D = undefined> = {
+  type: string;
+  detail?: D;
+  target?: EventTarget;
 };
 
-/**
- * A mute button with some basic volume level indication
- */
-const MuteButton = () => {
-  /**
-   * The useMediaDispatch() hook is returns a function for dispatching media state change requests to the <MediaProvider/>'s
-   * MediaStore. State change requests, or "actions," have a well defined "type" (defined in MediaActionTypes) and, depending on the type of request, may
-   * also require some well defined "detail" about the request. For an example of a state change request, see below.
-   */
-  const dispatch = useMediaDispatch();
-  /**
-   * The useMediaSelector() hook is how you get the latest bit(s) of media state you care about in your component.
-   * mediaVolumeLevel is an example of some "convenience media state" that the MediaStore provides to describe the "level"
-   * of volume (high, medium, low, or off) based on both the media's volume and muted state.
-   */
-  const mediaVolumeLevel = useMediaSelector((state) => state.mediaVolumeLevel);
+const MUIMediaMuteButton = ({
+  onmediamuterequest = () => {},
+  onmediaunmuterequest = () => {},
+  mediaVolumeLevel = 'DEFAULT',
+}: {
+  /** @TODO improve type composition crud (CJP) */
+  onmediamuterequest?: (eventOrAction: EventOrAction) => void;
+  onmediaunmuterequest?: (eventOrAction: EventOrAction) => void;
+  mediaVolumeLevel?:
+    | keyof typeof VolumeIconComponentMap
+    | 'DEFAULT'
+    | undefined;
+}) => {
   /**
    * Treat the volume level "off" as muted state for our state change requests.
    */
@@ -57,7 +57,7 @@ const MuteButton = () => {
   /**
    * Pick which icon we should show based on the current mediaVolumeLevel
    */
-  const IconComponent = VolumeIconComponentMap[mediaVolumeLevel ?? 'DEFAULT'];
+  const IconComponent = VolumeIconComponentMap[mediaVolumeLevel];
   return (
     <Tooltip title={label} placement="top">
       <IconButton
@@ -69,10 +69,13 @@ const MuteButton = () => {
          * or a MEDIA_MUTE_REQUEST (if we're not).
          */
         onClick={() => {
-          const type = mediaPseudoMuted
-            ? MediaActionTypes.MEDIA_UNMUTE_REQUEST
-            : MediaActionTypes.MEDIA_MUTE_REQUEST;
-          dispatch({ type });
+          if (mediaPseudoMuted) {
+            onmediaunmuterequest({
+              type: MediaActionTypes.MEDIA_UNMUTE_REQUEST,
+            });
+          } else {
+            onmediamuterequest({ type: MediaActionTypes.MEDIA_MUTE_REQUEST });
+          }
         }}
       >
         <IconComponent />
@@ -81,4 +84,4 @@ const MuteButton = () => {
   );
 };
 
-export default MuteButton;
+export default MUIMediaMuteButton;
