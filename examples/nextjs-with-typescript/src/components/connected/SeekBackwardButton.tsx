@@ -1,15 +1,13 @@
-import { MediaSeekBackwardButton as BaseMediaSeekBackwardButton } from 'media-chrome/react';
-
+import { MediaSeekBackwardButton as BaseComponent } from 'media-chrome/react';
 import {
   useMediaDispatch,
   useMediaSelector,
   MediaActionTypes,
 } from 'media-chrome/react/media-store';
 import type { ElementType } from 'react';
-// import { EventOrAction } from '../../../../../../dist/media-store/state-mediator';
 
 const SeekBackwardButton = ({
-  component = BaseMediaSeekBackwardButton,
+  component = BaseComponent,
   seekOffset,
 }: {
   component?: ElementType;
@@ -20,12 +18,10 @@ const SeekBackwardButton = ({
   const mediaCurrentTime = useMediaSelector(
     (state) => state.mediaCurrentTime ?? 0
   );
-  // @ts-ignore
   return (
     <Component
       {...{
         [`on${MediaActionTypes.MEDIA_SEEK_REQUEST}`]: dispatch,
-        // @ts-ignore
       }}
       mediaCurrentTime={mediaCurrentTime}
       seekOffset={seekOffset}

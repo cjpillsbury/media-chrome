@@ -5,12 +5,12 @@ import Seekbar from './Seekbar';
 import DurationDisplay from './DurationDisplay';
 import MUIMediaPlayButton from './PlayButton';
 import MUIMediaSeekBackwardButton from './SeekBackwardButton';
-import SeekForwardButton from './SeekForwardButton';
+import MUIMediaSeekForwardButton from './SeekForwardButton';
 import MUIMediaMuteButton from './MuteButton';
 import VolumeSlider from './VolumeSlider';
 import PlaybackRateMenuButton from './PlaybackRateMenuButton';
-import PipButton from './PipButton';
-import FullscreenButton from './FullscreenButton';
+import MUIMediaPipButton from './PipButton';
+import MUIMediaFullscreenButton from './FullscreenButton';
 import RenditionsMenuButton from './RenditionsMenuButton';
 import CaptionsMenuButton from './CaptionsMenuButton';
 import { useEffect, useState } from 'react';
@@ -21,6 +21,9 @@ import SeekForwardGestureRegion from './SeekForwardGestureRegion';
 import MuteButton from '@/components/connected/MuteButton';
 import PlayButton from '@/components/connected/PlayButton';
 import SeekBackwardButton from '@/components/connected/SeekBackwardButton';
+import SeekForwardButton from '@/components/connected/SeekForwardButton';
+import PipButton from '@/components/connected/PipButton';
+import FullscreenButton from '@/components/connected/FullscreenButton';
 
 /**
  * @description A mostly simple UI of control/display components integrated into the <MediaProvider/>'s MediaStore.
@@ -93,9 +96,10 @@ const ControlsContainer = () => {
       <Stack direction="row" alignItems="center">
         <PlayButton />
         <PlayButton component={MUIMediaPlayButton} />
-        <SeekBackwardButton />
+        <SeekBackwardButton seekOffset={15} />
         <SeekBackwardButton component={MUIMediaSeekBackwardButton} />
-        <SeekForwardButton />
+        <SeekForwardButton seekOffset={15} />
+        <SeekForwardButton component={MUIMediaSeekForwardButton} />
         <MuteButton />
         <MuteButton component={MUIMediaMuteButton} />
         <VolumeSlider />
@@ -106,7 +110,9 @@ const ControlsContainer = () => {
         <RenditionsMenuButton />
         <AudioMenuButton />
         <PipButton />
+        <PipButton component={MUIMediaPipButton} />
         <FullscreenButton />
+        <FullscreenButton component={MUIMediaFullscreenButton} />
       </Stack>
     </Stack>
   );
