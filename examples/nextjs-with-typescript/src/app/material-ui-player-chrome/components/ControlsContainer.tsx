@@ -5,8 +5,11 @@ import Seekbar from './Seekbar';
 import DurationDisplay from './DurationDisplay';
 import MUIMediaPlayButton from './PlayButton';
 import MUIMediaSeekBackwardButton from './SeekBackwardButton';
+// import RUIMediaSeekBackwardButton from '../radix-ui-components/SeekBackwardButton';
 import MUIMediaSeekForwardButton from './SeekForwardButton';
 import MUIMediaMuteButton from './MuteButton';
+import MUICaptionsButton from './CaptionsButton';
+import RUICaptionsButton from '../radix-ui-components/CaptionsButton';
 import VolumeSlider from './VolumeSlider';
 import PlaybackRateMenuButton from './PlaybackRateMenuButton';
 import MUIMediaPipButton from './PipButton';
@@ -24,7 +27,7 @@ import SeekBackwardButton from '@/components/connected/SeekBackwardButton';
 import SeekForwardButton from '@/components/connected/SeekForwardButton';
 import PipButton from '@/components/connected/PipButton';
 import FullscreenButton from '@/components/connected/FullscreenButton';
-
+import CaptionsButton from '@/components/connected/CaptionsButton';
 /**
  * @description A mostly simple UI of control/display components integrated into the <MediaProvider/>'s MediaStore.
  * @returns A react component that contains all of the primary control/display components for the player UI.
@@ -105,6 +108,9 @@ const ControlsContainer = () => {
         <VolumeSlider />
         {/* A horizontal spacer */}
         <Box sx={{ flexGrow: 1 }} />
+        <CaptionsButton />
+        <CaptionsButton component={MUICaptionsButton} />
+        <CaptionsButton component={RUICaptionsButton} />
         <CaptionsMenuButton />
         <PlaybackRateMenuButton />
         <RenditionsMenuButton />

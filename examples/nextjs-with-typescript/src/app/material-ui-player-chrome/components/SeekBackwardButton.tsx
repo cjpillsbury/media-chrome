@@ -4,7 +4,7 @@ import {
   MediaActionTypes,
 } from 'media-chrome/react/media-store';
 
-const label = 'Seek backward';
+const DEFAULT_LABEL = 'Seek backward';
 
 type EventOrAction<D = undefined> = {
   type: string;
@@ -20,14 +20,19 @@ const MUIMediaSeekBackwardButton = ({
   onmediaseekrequest = () => {},
   // NOTE: Does not support seekOffset due to icon impl
   // seekOffset = 30,
+  tooltipLabel = DEFAULT_LABEL,
+  ariaLabel = tooltipLabel,
+
 }: {
   mediaCurrentTime?: number,
   onmediaseekrequest?: (eventOrAction: EventOrAction<number>) => void;
+  tooltipLabel: string;
+  ariaLabel: string;
 }) => {
   return (
-    <Tooltip title={label} placement="top">
+    <Tooltip title={tooltipLabel} placement="top">
       <IconButton
-        aria-label={label}
+        aria-label={ariaLabel}
         color="primary"
         /**
          * This is an example of using dispatch() to make a state change request. In this case, whenever

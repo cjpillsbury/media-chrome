@@ -1,16 +1,24 @@
+import { t } from 'media-chrome';
 import { MediaSeekForwardButton as BaseComponent } from 'media-chrome/react';
-
 import {
   useMediaDispatch,
   useMediaSelector,
   MediaActionTypes,
 } from 'media-chrome/react/media-store';
 import type { ElementType } from 'react';
-// import { EventOrAction } from '../../../../../../dist/media-store/state-mediator';
 
+const propsToTooltipLabel = (_props: any) => {
+  return t('Seek forward');
+};
+
+const propsToAriaLabel = ({ seekOffset = 0 }: { seekOffset: number }) => {
+  return t('seek forward {seekOffset} seconds', { seekOffset });
+};
+
+const DEFAULT_SEEK_OFFSET = 30;
 const SeekForwardButton = ({
   component = BaseComponent,
-  seekOffset,
+  seekOffset = DEFAULT_SEEK_OFFSET,
 }: {
   component?: ElementType;
   seekOffset?: number;
@@ -29,6 +37,8 @@ const SeekForwardButton = ({
       }}
       mediaCurrentTime={mediaCurrentTime}
       seekOffset={seekOffset}
+      ariaLabel={propsToAriaLabel({ seekOffset })}
+      tooltipLabel={propsToTooltipLabel({ seekOffset })}
     ></Component>
   );
 };

@@ -20,6 +20,11 @@ function HomePage() {
             Media Chrome react wrapper components example
           </Link>
         </li>
+        <li>
+          <Link className={styles.link} href="/radix-ui">
+            Radix UI!
+          </Link>
+        </li>
       </ul>
     </nav>
   );

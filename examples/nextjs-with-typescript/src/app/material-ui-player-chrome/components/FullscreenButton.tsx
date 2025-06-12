@@ -1,9 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
-import {
-  MediaActionTypes,
-} from 'media-chrome/react/media-store';
+import { MediaActionTypes } from 'media-chrome/react/media-store';
 
 type EventOrAction<D = undefined> = {
   type: string;
@@ -15,14 +13,18 @@ type EventOrAction<D = undefined> = {
  * A simple button to enter/exit fullscreen mode
  */
 const FullscreenButton = ({
-  onmediaenterfullsreenrequest = () => {},
+  onmediaenterfullscreenrequest = () => {},
   onmediaexitfullscreenrequest = () => {},
   mediaIsFullscreen = false,
+  tooltipLabel,
+  ariaLabel = tooltipLabel,
 }: {
   /** @TODO improve type composition crud (CJP) */
-  onmediaenterfullsreenrequest?: (eventOrAction: EventOrAction) => void;
+  onmediaenterfullscreenrequest?: (eventOrAction: EventOrAction) => void;
   onmediaexitfullscreenrequest?: (eventOrAction: EventOrAction) => void;
   mediaIsFullscreen?: boolean;
+  tooltipLabel: string;
+  ariaLabel: string;
 }) => {
   /**
    * Here we're picking which MUI icon to show based on whether or not we're in fullscreen mode
@@ -31,11 +33,10 @@ const FullscreenButton = ({
   /**
    * And also changing the text for both the tooltip and our aria-label (for a11y)
    */
-  const label = mediaIsFullscreen ? 'Exit full screen' : 'Full screen';
   return (
-    <Tooltip title={label} placement="top">
+    <Tooltip title={tooltipLabel} placement="top">
       <IconButton
-        aria-label={label}
+        aria-label={ariaLabel}
         color="primary"
         /**
          * This is an example of using dispatch() to make a state change request. In this case, whenever
@@ -48,7 +49,7 @@ const FullscreenButton = ({
               type: MediaActionTypes.MEDIA_EXIT_FULLSCREEN_REQUEST,
             });
           } else {
-            onmediaenterfullsreenrequest({
+            onmediaenterfullscreenrequest({
               type: MediaActionTypes.MEDIA_ENTER_FULLSCREEN_REQUEST,
             });
           }
