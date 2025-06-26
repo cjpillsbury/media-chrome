@@ -450,6 +450,7 @@ class MediaController extends MediaContainer {
   }
 
   associateElement(element: HTMLElement) {
+    return;
     if (!element) return;
     const { associatedElementSubscriptions } = this;
 
@@ -480,6 +481,7 @@ class MediaController extends MediaContainer {
   }
 
   unassociateElement(element: HTMLElement) {
+    return;
     if (!element) return;
     const { associatedElementSubscriptions } = this;
     if (!associatedElementSubscriptions.has(element)) return;
@@ -494,6 +496,7 @@ class MediaController extends MediaContainer {
   }
 
   registerMediaStateReceiver(el: HTMLElement) {
+    return;
     if (!el) return;
     const els = this.mediaStateReceivers;
     const index = els.indexOf(el);
@@ -511,6 +514,7 @@ class MediaController extends MediaContainer {
   }
 
   unregisterMediaStateReceiver(el: HTMLElement) {
+    return;
     const els = this.mediaStateReceivers;
 
     const index = els.indexOf(el);

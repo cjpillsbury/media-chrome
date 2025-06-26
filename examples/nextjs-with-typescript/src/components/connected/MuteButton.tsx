@@ -1,27 +1,54 @@
-import { MediaMuteButton as BaseComponent } from 'media-chrome/react';
+// NOTE: This is an example of a "skeletal" connected component definition of a Mute Button. It "knows about" A Media (UI) Store and expects
+// to be provided a non-connected component
 import {
   useMediaDispatch,
   useMediaSelector,
-  MediaActionTypes,
 } from 'media-chrome/react/media-store';
-import type { ElementType } from 'react';
+import type { MediaState } from 'media-chrome/react/media-store';
+import type { CSSProperties, ElementType, PropsWithChildren } from 'react';
+
+/** @TODO Export more types. Define more contracts (CJP) */
+type MediaCallbackType = ReturnType<typeof useMediaDispatch>;
+
+type DefaultMuteButtonState = Pick<MediaState, 'mediaVolumeLevel'>;
+/** @TODO Support camel case deeply for callbacks. Define these as consts and types in core lib with clear relationships to event types (CJP) */
+type DefaultMuteButtonEventCallbacks = {
+  onmediamuterequest: MediaCallbackType;
+  onmediaunmuterequest: MediaCallbackType;
+};
+type ComponentType = ElementType<
+  PropsWithChildren<
+    Partial<
+      DefaultMuteButtonState &
+        DefaultMuteButtonEventCallbacks & {
+          className: string | undefined;
+          style: CSSProperties | undefined;
+        }
+    >
+  >
+>;
 
 const MuteButton = ({
-  component = BaseComponent,
-}: {
-  component?: ElementType;
-}) => {
+  component,
+  children,
+  ...props
+}: PropsWithChildren<{
+  component: ComponentType;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+}>) => {
   const Component = component;
   const dispatch = useMediaDispatch();
   const mediaVolumeLevel = useMediaSelector((state) => state.mediaVolumeLevel);
   return (
     <Component
-      {...{
-        [`on${MediaActionTypes.MEDIA_MUTE_REQUEST}`]: dispatch,
-        [`on${MediaActionTypes.MEDIA_UNMUTE_REQUEST}`]: dispatch,
-      }}
+      {...props}
+      onmediamuterequest={dispatch}
+      onmediaunmuterequest={dispatch}
       mediaVolumeLevel={mediaVolumeLevel}
-    ></Component>
+    >
+      {children}
+    </Component>
   );
 };
 

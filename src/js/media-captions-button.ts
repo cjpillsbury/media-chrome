@@ -47,7 +47,7 @@ const tooltipContent = /*html*/ `
 `;
 
 const updateAriaChecked = (el: HTMLElement) => {
-  el.setAttribute('aria-checked', areSubsOn(el).toString());
+  el.ariaChecked = areSubsOn(el).toString();
 };
 
 /**
@@ -69,13 +69,8 @@ class MediaCaptionsButton extends MediaChromeButton {
     ];
   }
 
-  private _captionsReady: boolean;
-
   constructor(options: any = {}) {
     super({ slotTemplate, tooltipContent, ...options });
-    // Internal variable to keep track of when we have some or no captions (or subtitles, if using subtitles fallback)
-    // Used for `default-showing` behavior.
-    this._captionsReady = false;
   }
 
   connectedCallback(): void {

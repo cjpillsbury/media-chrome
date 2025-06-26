@@ -16,13 +16,14 @@ import MUIMediaPipButton from './PipButton';
 import MUIMediaFullscreenButton from './FullscreenButton';
 import RenditionsMenuButton from './RenditionsMenuButton';
 import CaptionsMenuButton from './CaptionsMenuButton';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import AudioMenuButton from './AudioMenuButton';
 import TogglePausedGestureRegion from './TogglePausedGestureRegion';
 import SeekBackwardGestureRegion from './SeekBackwardGestureRegion';
 import SeekForwardGestureRegion from './SeekForwardGestureRegion';
-import MuteButton from '@/components/connected/MuteButton';
-import PlayButton from '@/components/connected/PlayButton';
+import MuteButton from '@/components/connected-with-defaults/MuteButton';
+// import PlayButton from '@/components/connected/PlayButton';
+import PlayButton from '@/components/connected-with-defaults/PlayButton';
 import SeekBackwardButton from '@/components/connected/SeekBackwardButton';
 import SeekForwardButton from '@/components/connected/SeekForwardButton';
 import PipButton from '@/components/connected/PipButton';
@@ -46,7 +47,6 @@ const ControlsContainer = () => {
 
   const [userActive, setUserActive] = useState(false);
 
-  useEffect(() => {});
   return (
     <Stack
       onMouseMove={() => setUserActive(true)}

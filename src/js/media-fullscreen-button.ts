@@ -54,18 +54,29 @@ slotTemplate.innerHTML = /*html*/ `
     <slot name="exit">${exitFullscreenIcon}</slot>
   </slot>
 `;
+/** @TODO Define these relationships better e.g. toggle action abstraction (CJP) */
+/** @TODO Pull these out of component module and use MediaStore state type defs (CJP) */
+export const propsToTooltipLabel = ({
+  mediaIsFullscreen,
+}: Pick<MediaFullscreenButton, 'mediaIsFullscreen'>) =>
+  mediaIsFullscreen ? t('Exit fullscreen mode') : t('Enter fullscreen mode');
 
 const tooltipContent = /*html*/ `
-  <slot name="tooltip-enter">${t('Enter fullscreen mode')}</slot>
-  <slot name="tooltip-exit">${t('Exit fullscreen mode')}</slot>
+  <slot name="tooltip-enter">${propsToTooltipLabel({ mediaIsFullscreen: false })}</slot>
+  <slot name="tooltip-exit">${propsToTooltipLabel({ mediaIsFullscreen: true })}</slot>
 `;
 
-const updateAriaLabel = (el: MediaFullscreenButton) => {
-  const label = el.mediaIsFullscreen
-    ? t('exit fullscreen mode')
-    : t('enter fullscreen mode');
-  el.setAttribute('aria-label', label);
+export const updateAriaLabel = (
+  el: Pick<MediaFullscreenButton, 'mediaIsFullscreen' | 'ariaLabel'>
+) => {
+  el.ariaLabel = propsToAriaLabel(el);
 };
+
+/** @TODO Pull these out of component module and use MediaStore state type defs (CJP) */
+export const propsToAriaLabel = ({
+  mediaIsFullscreen,
+}: Pick<MediaFullscreenButton, 'mediaIsFullscreen'>) =>
+  mediaIsFullscreen ? t('exit fullscreen mode') : t('enter fullscreen mode');
 
 /**
  * @slot enter - An element shown when the media is not in fullscreen and pressing the button will trigger entering fullscreen.
@@ -133,7 +144,7 @@ class MediaFullscreenButton extends MediaChromeButton {
     const eventName = this.mediaIsFullscreen
       ? MediaUIEvents.MEDIA_EXIT_FULLSCREEN_REQUEST
       : MediaUIEvents.MEDIA_ENTER_FULLSCREEN_REQUEST;
-      
+
     this.dispatchEvent(
       new globalThis.CustomEvent(eventName, { composed: true, bubbles: true })
     );

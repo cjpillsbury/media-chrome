@@ -262,6 +262,6 @@ export const areSubsOn = (
 ): boolean => {
   const showingSubtitles =
     !!el.mediaSubtitlesShowing?.length ||
-    el.hasAttribute(MediaUIAttributes.MEDIA_SUBTITLES_SHOWING);
+    !!el.getAttribute(MediaUIAttributes.MEDIA_SUBTITLES_SHOWING);
   return showingSubtitles;
 };

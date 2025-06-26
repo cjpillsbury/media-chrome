@@ -22,7 +22,7 @@ const slotTemplate = document.createElement('template');
 slotTemplate.innerHTML = /*html*/ `
   <style>
   ${/* Default to High slot/icon. */ ''}
-  :host(:not([${MEDIA_VOLUME_LEVEL}])) slot[name=icon] slot:not([name=high]), 
+  :host(:not([${MEDIA_VOLUME_LEVEL}])) slot[name=icon] slot:not([name=high]),
   :host([${MEDIA_VOLUME_LEVEL}=high]) slot[name=icon] slot:not([name=high]) {
     display: none !important;
   }
@@ -76,6 +76,7 @@ const updateAriaLabel = (el: MediaMuteButton) => {
  * @cssproperty [--media-mute-button-display = inline-flex] - `display` property of button.
  */
 class MediaMuteButton extends MediaChromeButton {
+  static get events() { return [MediaUIEvents.MEDIA_UNMUTE_REQUEST, MediaUIEvents.MEDIA_MUTE_REQUEST]; }
   static get observedAttributes(): string[] {
     return [...super.observedAttributes, MediaUIAttributes.MEDIA_VOLUME_LEVEL];
   }

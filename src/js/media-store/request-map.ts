@@ -128,21 +128,21 @@ export const requestMap: RequestMap = {
     const key = 'mediaPaused';
     const value = false;
 
-    const isLive =
-      stateMediator.mediaStreamType.get(stateOwners) === StreamTypes.LIVE;
-    const canAutoSeekToLive = !stateOwners.options?.noAutoSeekToLive;
-    const isDVR = stateMediator.mediaTargetLiveWindow.get(stateOwners) > 0;
+    // const isLive =
+    //   stateMediator.mediaStreamType.get(stateOwners) === StreamTypes.LIVE;
+    // const canAutoSeekToLive = !stateOwners.options?.noAutoSeekToLive;
+    // const isDVR = stateMediator.mediaTargetLiveWindow.get(stateOwners) > 0;
 
-    if (isLive && canAutoSeekToLive && !isDVR) {
-      const seekableEnd = stateMediator.mediaSeekable.get(stateOwners)?.[1];
+    // if (isLive && canAutoSeekToLive && !isDVR) {
+    //   const seekableEnd = stateMediator.mediaSeekable.get(stateOwners)?.[1];
 
-      // Only seek to live if we are live, not DVR, and have a known seekable end
-      if (seekableEnd) {
-        const seekToLiveOffset = stateOwners.options?.seekToLiveOffset ?? 0;
-        const liveEdgeTime = seekableEnd - seekToLiveOffset;
-        stateMediator.mediaCurrentTime.set(liveEdgeTime, stateOwners);
-      }
-    }
+    //   // Only seek to live if we are live, not DVR, and have a known seekable end
+    //   if (seekableEnd) {
+    //     const seekToLiveOffset = stateOwners.options?.seekToLiveOffset ?? 0;
+    //     const liveEdgeTime = seekableEnd - seekToLiveOffset;
+    //     stateMediator.mediaCurrentTime.set(liveEdgeTime, stateOwners);
+    //   }
+    // }
 
     stateMediator[key].set(value, stateOwners);
   },
@@ -151,9 +151,9 @@ export const requestMap: RequestMap = {
     stateOwners,
     { detail }
   ) {
-    const key = 'mediaPlaybackRate';
-    const value = detail;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaPlaybackRate';
+    // const value = detail;
+    // stateMediator[key]?.set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_MUTE_REQUEST](stateMediator, stateOwners) {
     const key = 'mediaMuted';
@@ -180,23 +180,23 @@ export const requestMap: RequestMap = {
     stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_SEEK_REQUEST](stateMediator, stateOwners, { detail }) {
-    const key = 'mediaCurrentTime';
-    const value = detail;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaCurrentTime';
+    // const value = detail;
+    // stateMediator[key]?.set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_SEEK_TO_LIVE_REQUEST](stateMediator, stateOwners) {
     // This is an example of a specialized state change request "action" that doesn't need a specialized
     // state facade model
-    const key = 'mediaCurrentTime';
-    const seekableEnd = stateMediator.mediaSeekable.get(stateOwners)?.[1];
+    // const key = 'mediaCurrentTime';
+    // const seekableEnd = stateMediator.mediaSeekable?.get(stateOwners)?.[1];
 
-    // If we don't have a known seekable end (which represents the live edge), bail early
-    if (Number.isNaN(Number(seekableEnd))) return;
+    // // If we don't have a known seekable end (which represents the live edge), bail early
+    // if (Number.isNaN(Number(seekableEnd))) return;
 
-    const seekToLiveOffset = stateOwners.options?.seekToLiveOffset ?? 0;
-    const value = seekableEnd - seekToLiveOffset;
+    // const seekToLiveOffset = stateOwners.options?.seekToLiveOffset ?? 0;
+    // const value = seekableEnd - seekToLiveOffset;
 
-    stateMediator[key].set(value, stateOwners);
+    // stateMediator[key]?.set(value, stateOwners);
   },
   // Text Tracks state change requests
   [MediaUIEvents.MEDIA_SHOW_SUBTITLES_REQUEST](
@@ -204,33 +204,33 @@ export const requestMap: RequestMap = {
     stateOwners,
     { detail }
   ) {
-    const { options } = stateOwners;
-    const tracks = getSubtitleTracks(stateOwners);
-    const tracksToUpdate = parseTracks(detail);
-    const preferredLanguage = tracksToUpdate[0]?.language;
-    if (preferredLanguage && !options.noSubtitlesLangPref) {
-      globalThis.localStorage.setItem(
-        'media-chrome-pref-subtitles-lang',
-        preferredLanguage
-      );
-    }
-    updateTracksModeTo(TextTrackModes.SHOWING, tracks, tracksToUpdate);
+    // const { options } = stateOwners;
+    // const tracks = getSubtitleTracks(stateOwners);
+    // const tracksToUpdate = parseTracks(detail);
+    // const preferredLanguage = tracksToUpdate[0]?.language;
+    // if (preferredLanguage && !options.noSubtitlesLangPref) {
+    //   globalThis.localStorage.setItem(
+    //     'media-chrome-pref-subtitles-lang',
+    //     preferredLanguage
+    //   );
+    // }
+    // updateTracksModeTo(TextTrackModes.SHOWING, tracks, tracksToUpdate);
   },
   [MediaUIEvents.MEDIA_DISABLE_SUBTITLES_REQUEST](
     _stateMediator,
     stateOwners,
     { detail }
   ) {
-    const tracks = getSubtitleTracks(stateOwners);
-    const tracksToUpdate = detail ?? [];
-    updateTracksModeTo(TextTrackModes.DISABLED, tracks, tracksToUpdate);
+    // const tracks = getSubtitleTracks(stateOwners);
+    // const tracksToUpdate = detail ?? [];
+    // updateTracksModeTo(TextTrackModes.DISABLED, tracks, tracksToUpdate);
   },
   [MediaUIEvents.MEDIA_TOGGLE_SUBTITLES_REQUEST](
     _stateMediator,
     stateOwners,
     { detail }
   ) {
-    toggleSubtitleTracks(stateOwners, detail);
+    // toggleSubtitleTracks(stateOwners, detail);
   },
   // Renditions/Tracks state change requests
   [MediaUIEvents.MEDIA_RENDITION_REQUEST](
@@ -238,68 +238,68 @@ export const requestMap: RequestMap = {
     stateOwners,
     { detail }
   ) {
-    const key = 'mediaRenditionSelected';
-    const value = detail;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaRenditionSelected';
+    // const value = detail;
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_AUDIO_TRACK_REQUEST](
     stateMediator,
     stateOwners,
     { detail }
   ) {
-    const key = 'mediaAudioTrackEnabled';
-    const value = detail;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaAudioTrackEnabled';
+    // const value = detail;
+    // stateMediator[key].set(value, stateOwners);
   },
   // State change requests dependent on root node
   [MediaUIEvents.MEDIA_ENTER_PIP_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsPip';
-    const value = true;
-    // Exit fullscreen if in fullscreen and entering PiP
-    if (stateMediator.mediaIsFullscreen.get(stateOwners)) {
-      // Should be async
-      stateMediator.mediaIsFullscreen.set(false, stateOwners);
-    }
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsPip';
+    // const value = true;
+    // // Exit fullscreen if in fullscreen and entering PiP
+    // if (stateMediator.mediaIsFullscreen.get(stateOwners)) {
+    //   // Should be async
+    //   stateMediator.mediaIsFullscreen.set(false, stateOwners);
+    // }
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_EXIT_PIP_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsPip';
-    const value = false;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsPip';
+    // const value = false;
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_ENTER_FULLSCREEN_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsFullscreen';
-    const value = true;
-    // Exit PiP if in PiP and entering fullscreen
-    if (stateMediator.mediaIsPip.get(stateOwners)) {
-      // Should be async
-      stateMediator.mediaIsPip.set(false, stateOwners);
-    }
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsFullscreen';
+    // const value = true;
+    // // Exit PiP if in PiP and entering fullscreen
+    // if (stateMediator.mediaIsPip.get(stateOwners)) {
+    //   // Should be async
+    //   stateMediator.mediaIsPip.set(false, stateOwners);
+    // }
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_EXIT_FULLSCREEN_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsFullscreen';
-    const value = false;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsFullscreen';
+    // const value = false;
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_ENTER_CAST_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsCasting';
-    const value = true;
-    // Exit fullscreen if in fullscreen and attempting to cast
-    if (stateMediator.mediaIsFullscreen.get(stateOwners)) {
-      // Should be async
-      stateMediator.mediaIsFullscreen.set(false, stateOwners);
-    }
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsCasting';
+    // const value = true;
+    // // Exit fullscreen if in fullscreen and attempting to cast
+    // if (stateMediator.mediaIsFullscreen.get(stateOwners)) {
+    //   // Should be async
+    //   stateMediator.mediaIsFullscreen.set(false, stateOwners);
+    // }
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_EXIT_CAST_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsCasting';
-    const value = false;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsCasting';
+    // const value = false;
+    // stateMediator[key].set(value, stateOwners);
   },
   [MediaUIEvents.MEDIA_AIRPLAY_REQUEST](stateMediator, stateOwners) {
-    const key = 'mediaIsAirplaying';
-    const value = true;
-    stateMediator[key].set(value, stateOwners);
+    // const key = 'mediaIsAirplaying';
+    // const value = true;
+    // stateMediator[key].set(value, stateOwners);
   },
 };

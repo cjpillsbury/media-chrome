@@ -1,16 +1,40 @@
-import { MediaPlayButton as BaseComponent } from 'media-chrome/react';
 import {
   useMediaDispatch,
   useMediaSelector,
-  MediaActionTypes,
 } from 'media-chrome/react/media-store';
-import type { ElementType } from 'react';
+import type { MediaState } from 'media-chrome/react/media-store';
+import type { CSSProperties, ElementType, PropsWithChildren } from 'react';
+
+/** @TODO Export more types. Define more contracts (CJP) */
+type MediaCallbackType = ReturnType<typeof useMediaDispatch>;
+
+type DefaultPlayButtonState = Pick<MediaState, 'mediaPaused'>;
+/** @TODO Support camel case deeply for callbacks. Define these as consts and types in core lib with clear relationships to event types (CJP) */
+type DefaultPlayButtonEventCallbacks = {
+  onmediaplayrequest: MediaCallbackType;
+  onmediapauserequest: MediaCallbackType;
+};
+type ComponentType = ElementType<
+  PropsWithChildren<
+    Partial<
+      DefaultPlayButtonState &
+        DefaultPlayButtonEventCallbacks & {
+          className: string | undefined;
+          style: CSSProperties | undefined;
+        }
+    >
+  >
+>;
 
 const PlayButton = ({
-  component = BaseComponent,
-}: {
-  component?: ElementType;
-}) => {
+  component,
+  children,
+  ...props
+}: PropsWithChildren<{
+  component: ComponentType;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+}>) => {
   const Component = component;
   const dispatch = useMediaDispatch();
   const mediaPaused = useMediaSelector(
@@ -18,12 +42,13 @@ const PlayButton = ({
   );
   return (
     <Component
-      {...{
-        [`on${MediaActionTypes.MEDIA_PLAY_REQUEST}`]: dispatch,
-        [`on${MediaActionTypes.MEDIA_PAUSE_REQUEST}`]: dispatch,
-      }}
+      {...props}
+      onmediaplayrequest={dispatch}
+      onmediapauserequest={dispatch}
       mediaPaused={mediaPaused}
-    ></Component>
+    >
+      {children}
+    </Component>
   );
 };
 

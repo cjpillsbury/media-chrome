@@ -1,4 +1,4 @@
-import MediaSeekForwardIcon from "@/components/icons/MediaSeekForwardIcon";
+import MediaSeekForwardIcon from "@/components/icons/SeekForwardIcon";
 
 export const MomentaryPush = {
   Root: (_props: { onPressed: (x?: any) => void; children: Element }) => {

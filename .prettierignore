@@ -21,6 +21,8 @@ sandbox/*
 
 ## for now, ignore these directories as well
 docs
-examples
+# examples
+!examples/nextjs-with-typescript/src"
+
 scripts
 .github

@@ -201,18 +201,19 @@ export type FacadeProp<T, S = T, D = T> = ReadonlyFacadeProp<T, D> & {
  *
  */
 export type StateMediator = {
+  mediaPaused: FacadeProp<HTMLMediaElement['paused']>;
+  mediaMuted: FacadeProp<HTMLMediaElement['muted']>;
+  mediaVolume: FacadeProp<HTMLMediaElement['volume']>;
+  mediaVolumeLevel: ReadonlyFacadeProp<'high' | 'medium' | 'low' | 'off'>;
+} & Partial<{
   mediaErrorCode: ReadonlyFacadeProp<MediaError['code']>;
   mediaErrorMessage: ReadonlyFacadeProp<MediaError['message']>;
   mediaError: ReadonlyFacadeProp<MediaError>;
   mediaWidth: ReadonlyFacadeProp<number>;
   mediaHeight: ReadonlyFacadeProp<number>;
-  mediaPaused: FacadeProp<HTMLMediaElement['paused']>;
   mediaHasPlayed: ReadonlyFacadeProp<boolean>;
   mediaEnded: ReadonlyFacadeProp<HTMLMediaElement['ended']>;
   mediaPlaybackRate: FacadeProp<HTMLMediaElement['playbackRate']>;
-  mediaMuted: FacadeProp<HTMLMediaElement['muted']>;
-  mediaVolume: FacadeProp<HTMLMediaElement['volume']>;
-  mediaVolumeLevel: ReadonlyFacadeProp<'high' | 'medium' | 'low' | 'off'>;
   mediaCurrentTime: FacadeProp<HTMLMediaElement['currentTime']>;
   mediaDuration: ReadonlyFacadeProp<HTMLMediaElement['duration']>;
   mediaLoading: ReadonlyFacadeProp<boolean>;
@@ -253,7 +254,7 @@ export type StateMediator = {
   mediaAudioTrackUnavailable: ReadonlyFacadeProp<
     AvailabilityStates | undefined
   >;
-};
+}>;
 
 const StreamTypeValues = Object.values(StreamTypes);
 
@@ -294,46 +295,46 @@ export const prepareStateOwners = async (
 };
 
 export const stateMediator: StateMediator = {
-  mediaError: {
-    get(stateOwners, event) {
-      const { media } = stateOwners;
-      if (event?.type === 'playing') return;
-      // Add additional error info via the `mediaError` element property only.
-      // This can be used in the MediaErrorDialog.formatErrorMessage() method.
-      return media?.error;
-    },
-    mediaEvents: ['emptied', 'error', 'playing'],
-  },
-  mediaErrorCode: {
-    get(stateOwners, event) {
-      const { media } = stateOwners;
-      if (event?.type === 'playing') return;
-      return media?.error?.code;
-    },
-    mediaEvents: ['emptied', 'error', 'playing'],
-  },
-  mediaErrorMessage: {
-    get(stateOwners, event) {
-      const { media } = stateOwners;
-      if (event?.type === 'playing') return;
-      return media?.error?.message ?? '';
-    },
-    mediaEvents: ['emptied', 'error', 'playing'],
-  },
-  mediaWidth: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      return media?.videoWidth ?? 0;
-    },
-    mediaEvents: ['resize'],
-  },
-  mediaHeight: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      return media?.videoHeight ?? 0;
-    },
-    mediaEvents: ['resize'],
-  },
+  // mediaError: {
+  //   get(stateOwners, event) {
+  //     const { media } = stateOwners;
+  //     if (event?.type === 'playing') return;
+  //     // Add additional error info via the `mediaError` element property only.
+  //     // This can be used in the MediaErrorDialog.formatErrorMessage() method.
+  //     return media?.error;
+  //   },
+  //   mediaEvents: ['emptied', 'error', 'playing'],
+  // },
+  // mediaErrorCode: {
+  //   get(stateOwners, event) {
+  //     const { media } = stateOwners;
+  //     if (event?.type === 'playing') return;
+  //     return media?.error?.code;
+  //   },
+  //   mediaEvents: ['emptied', 'error', 'playing'],
+  // },
+  // mediaErrorMessage: {
+  //   get(stateOwners, event) {
+  //     const { media } = stateOwners;
+  //     if (event?.type === 'playing') return;
+  //     return media?.error?.message ?? '';
+  //   },
+  //   mediaEvents: ['emptied', 'error', 'playing'],
+  // },
+  // mediaWidth: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     return media?.videoWidth ?? 0;
+  //   },
+  //   mediaEvents: ['resize'],
+  // },
+  // mediaHeight: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     return media?.videoHeight ?? 0;
+  //   },
+  //   mediaEvents: ['resize'],
+  // },
   mediaPaused: {
     get(stateOwners) {
       const { media } = stateOwners;
@@ -352,41 +353,41 @@ export const stateMediator: StateMediator = {
     },
     mediaEvents: ['play', 'playing', 'pause', 'emptied'],
   },
-  mediaHasPlayed: {
-    // We want to let the user know that the media started playing at any point (`media-has-played`).
-    // Since these propagators are all called when boostrapping state, let's verify this is
-    // a real playing event by checking that 1) there's media and 2) it isn't currently paused.
-    get(stateOwners, event) {
-      const { media } = stateOwners;
+  // mediaHasPlayed: {
+  //   // We want to let the user know that the media started playing at any point (`media-has-played`).
+  //   // Since these propagators are all called when boostrapping state, let's verify this is
+  //   // a real playing event by checking that 1) there's media and 2) it isn't currently paused.
+  //   get(stateOwners, event) {
+  //     const { media } = stateOwners;
 
-      if (!media) return false;
-      if (!event) return !media.paused;
-      return event.type === 'playing';
-    },
-    mediaEvents: ['playing', 'emptied'],
-  },
-  mediaEnded: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     if (!media) return false;
+  //     if (!event) return !media.paused;
+  //     return event.type === 'playing';
+  //   },
+  //   mediaEvents: ['playing', 'emptied'],
+  // },
+  // mediaEnded: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      return media?.ended ?? false;
-    },
-    mediaEvents: ['seeked', 'ended', 'emptied'],
-  },
-  mediaPlaybackRate: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     return media?.ended ?? false;
+  //   },
+  //   mediaEvents: ['seeked', 'ended', 'emptied'],
+  // },
+  // mediaPlaybackRate: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      return media?.playbackRate ?? 1;
-    },
-    set(value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media) return;
-      if (!Number.isFinite(+value)) return;
-      media.playbackRate = +value;
-    },
-    mediaEvents: ['ratechange', 'loadstart'],
-  },
+  //     return media?.playbackRate ?? 1;
+  //   },
+  //   set(value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media) return;
+  //     if (!Number.isFinite(+value)) return;
+  //     media.playbackRate = +value;
+  //   },
+  //   mediaEvents: ['ratechange', 'loadstart'],
+  // },
   mediaMuted: {
     get(stateOwners) {
       const { media } = stateOwners;
@@ -495,736 +496,736 @@ export const stateMediator: StateMediator = {
     },
     mediaEvents: ['volumechange'],
   },
-  mediaCurrentTime: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  // mediaCurrentTime: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      return media?.currentTime ?? 0;
-    },
-    set(value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media || !isValidNumber(value)) return;
-      media.currentTime = value;
-    },
-    mediaEvents: ['timeupdate', 'loadedmetadata'],
-  },
-  mediaDuration: {
-    get(stateOwners) {
-      const { media, options: { defaultDuration } = {} } = stateOwners;
+  //     return media?.currentTime ?? 0;
+  //   },
+  //   set(value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media || !isValidNumber(value)) return;
+  //     media.currentTime = value;
+  //   },
+  //   mediaEvents: ['timeupdate', 'loadedmetadata'],
+  // },
+  // mediaDuration: {
+  //   get(stateOwners) {
+  //     const { media, options: { defaultDuration } = {} } = stateOwners;
 
-      // If `defaultduration` is set and we don't yet have a usable `duration`
-      // available, use the default duration.
-      if (
-        defaultDuration &&
-        (!media ||
-          !media.duration ||
-          Number.isNaN(media.duration) ||
-          !Number.isFinite(media.duration))
-      ) {
-        return defaultDuration;
-      }
+  //     // If `defaultduration` is set and we don't yet have a usable `duration`
+  //     // available, use the default duration.
+  //     if (
+  //       defaultDuration &&
+  //       (!media ||
+  //         !media.duration ||
+  //         Number.isNaN(media.duration) ||
+  //         !Number.isFinite(media.duration))
+  //     ) {
+  //       return defaultDuration;
+  //     }
 
-      return Number.isFinite(media?.duration) ? media.duration : Number.NaN;
-    },
-    mediaEvents: ['durationchange', 'loadedmetadata', 'emptied'],
-  },
-  mediaLoading: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     return Number.isFinite(media?.duration) ? media.duration : Number.NaN;
+  //   },
+  //   mediaEvents: ['durationchange', 'loadedmetadata', 'emptied'],
+  // },
+  // mediaLoading: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      return media?.readyState < 3;
-    },
-    mediaEvents: ['waiting', 'playing', 'emptied'],
-  },
-  mediaSeekable: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     return media?.readyState < 3;
+  //   },
+  //   mediaEvents: ['waiting', 'playing', 'emptied'],
+  // },
+  // mediaSeekable: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      if (!media?.seekable?.length) return undefined;
+  //     if (!media?.seekable?.length) return undefined;
 
-      const start = media.seekable.start(0);
-      const end = media.seekable.end(media.seekable.length - 1);
+  //     const start = media.seekable.start(0);
+  //     const end = media.seekable.end(media.seekable.length - 1);
 
-      // Account for cases where metadata from slotted media has an "empty" seekable (CJP)
-      if (!start && !end) return undefined;
-      return [Number(start.toFixed(3)), Number(end.toFixed(3))];
-    },
-    mediaEvents: ['loadedmetadata', 'emptied', 'progress', 'seekablechange'],
-  },
-  mediaBuffered: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     // Account for cases where metadata from slotted media has an "empty" seekable (CJP)
+  //     if (!start && !end) return undefined;
+  //     return [Number(start.toFixed(3)), Number(end.toFixed(3))];
+  //   },
+  //   mediaEvents: ['loadedmetadata', 'emptied', 'progress', 'seekablechange'],
+  // },
+  // mediaBuffered: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      const timeRanges: any = media?.buffered ?? [];
-      return Array.from(timeRanges).map((_, i) => [
-        Number(timeRanges.start(i).toFixed(3)),
-        Number(timeRanges.end(i).toFixed(3)),
-      ]);
-    },
-    mediaEvents: ['progress', 'emptied'],
-  },
-  mediaStreamType: {
-    get(stateOwners) {
-      const { media, options: { defaultStreamType } = {} } = stateOwners;
+  //     const timeRanges: any = media?.buffered ?? [];
+  //     return Array.from(timeRanges).map((_, i) => [
+  //       Number(timeRanges.start(i).toFixed(3)),
+  //       Number(timeRanges.end(i).toFixed(3)),
+  //     ]);
+  //   },
+  //   mediaEvents: ['progress', 'emptied'],
+  // },
+  // mediaStreamType: {
+  //   get(stateOwners) {
+  //     const { media, options: { defaultStreamType } = {} } = stateOwners;
 
-      const usedDefaultStreamType = [
-        StreamTypes.LIVE,
-        StreamTypes.ON_DEMAND,
-      ].includes(defaultStreamType as any)
-        ? defaultStreamType
-        : undefined;
+  //     const usedDefaultStreamType = [
+  //       StreamTypes.LIVE,
+  //       StreamTypes.ON_DEMAND,
+  //     ].includes(defaultStreamType as any)
+  //       ? defaultStreamType
+  //       : undefined;
 
-      if (!media) return usedDefaultStreamType;
+  //     if (!media) return usedDefaultStreamType;
 
-      const { streamType } = media;
-      if (StreamTypeValues.includes(streamType)) {
-        // If the slotted media supports `streamType` but
-        // `streamType` is "unknown", prefer `usedDefaultStreamType`
-        // if set (CJP)
-        if (streamType === StreamTypes.UNKNOWN) {
-          return usedDefaultStreamType;
-        }
-        return streamType;
-      }
-      const duration = media.duration;
+  //     const { streamType } = media;
+  //     if (StreamTypeValues.includes(streamType)) {
+  //       // If the slotted media supports `streamType` but
+  //       // `streamType` is "unknown", prefer `usedDefaultStreamType`
+  //       // if set (CJP)
+  //       if (streamType === StreamTypes.UNKNOWN) {
+  //         return usedDefaultStreamType;
+  //       }
+  //       return streamType;
+  //     }
+  //     const duration = media.duration;
 
-      if (duration === Infinity) {
-        return StreamTypes.LIVE;
-      } else if (Number.isFinite(duration)) {
-        return StreamTypes.ON_DEMAND;
-      }
+  //     if (duration === Infinity) {
+  //       return StreamTypes.LIVE;
+  //     } else if (Number.isFinite(duration)) {
+  //       return StreamTypes.ON_DEMAND;
+  //     }
 
-      return usedDefaultStreamType;
-    },
-    mediaEvents: [
-      'emptied',
-      'durationchange',
-      'loadedmetadata',
-      'streamtypechange',
-    ],
-  },
-  mediaTargetLiveWindow: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     return usedDefaultStreamType;
+  //   },
+  //   mediaEvents: [
+  //     'emptied',
+  //     'durationchange',
+  //     'loadedmetadata',
+  //     'streamtypechange',
+  //   ],
+  // },
+  // mediaTargetLiveWindow: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      if (!media) return Number.NaN;
-      const { targetLiveWindow } = media;
-      const streamType = stateMediator.mediaStreamType.get(stateOwners);
+  //     if (!media) return Number.NaN;
+  //     const { targetLiveWindow } = media;
+  //     const streamType = stateMediator.mediaStreamType.get(stateOwners);
 
-      // Since `NaN` represents either "unknown" or "inapplicable", need to check if `streamType`
-      // is `"live"`. If so, assume it's "standard live" (aka `targetLiveWindow === 0`) (CJP)
-      if (
-        (targetLiveWindow == null || Number.isNaN(targetLiveWindow)) &&
-        streamType === StreamTypes.LIVE
-      ) {
-        return 0;
-      }
-      return targetLiveWindow;
-    },
-    mediaEvents: [
-      'emptied',
-      'durationchange',
-      'loadedmetadata',
-      'streamtypechange',
-      'targetlivewindowchange',
-    ],
-  },
-  mediaTimeIsLive: {
-    get(stateOwners) {
-      const {
-        media,
-        // Default to 10 seconds
-        options: { liveEdgeOffset = 10 } = {},
-      } = stateOwners;
+  //     // Since `NaN` represents either "unknown" or "inapplicable", need to check if `streamType`
+  //     // is `"live"`. If so, assume it's "standard live" (aka `targetLiveWindow === 0`) (CJP)
+  //     if (
+  //       (targetLiveWindow == null || Number.isNaN(targetLiveWindow)) &&
+  //       streamType === StreamTypes.LIVE
+  //     ) {
+  //       return 0;
+  //     }
+  //     return targetLiveWindow;
+  //   },
+  //   mediaEvents: [
+  //     'emptied',
+  //     'durationchange',
+  //     'loadedmetadata',
+  //     'streamtypechange',
+  //     'targetlivewindowchange',
+  //   ],
+  // },
+  // mediaTimeIsLive: {
+  //   get(stateOwners) {
+  //     const {
+  //       media,
+  //       // Default to 10 seconds
+  //       options: { liveEdgeOffset = 10 } = {},
+  //     } = stateOwners;
 
-      if (!media) return false;
+  //     if (!media) return false;
 
-      if (typeof media.liveEdgeStart === 'number') {
-        if (Number.isNaN(media.liveEdgeStart)) return false;
-        return media.currentTime >= media.liveEdgeStart;
-      }
+  //     if (typeof media.liveEdgeStart === 'number') {
+  //       if (Number.isNaN(media.liveEdgeStart)) return false;
+  //       return media.currentTime >= media.liveEdgeStart;
+  //     }
 
-      const live =
-        stateMediator.mediaStreamType.get(stateOwners) === StreamTypes.LIVE;
-      // Can't be playing live if it's not a live stream
-      if (!live) return false;
+  //     const live =
+  //       stateMediator.mediaStreamType.get(stateOwners) === StreamTypes.LIVE;
+  //     // Can't be playing live if it's not a live stream
+  //     if (!live) return false;
 
-      // Should this use `stateMediator.mediaSeekable.get(stateOwners)?.[1]` for separation
-      // of concerns/assumptions? (CJP)
-      const seekable = media.seekable;
-      // If the slotted media element is live but does not expose a 'seekable' `TimeRanges` object,
-      // always assume playing live
-      if (!seekable) return true;
-      // If there is an empty `seekable`, assume we are not playing live
-      if (!seekable.length) return false;
-      const liveEdgeStart = seekable.end(seekable.length - 1) - liveEdgeOffset;
-      return media.currentTime >= liveEdgeStart;
-    },
-    mediaEvents: ['playing', 'timeupdate', 'progress', 'waiting', 'emptied'],
-  },
-  // Text Tracks modeling
-  mediaSubtitlesList: {
-    get(stateOwners) {
-      return getSubtitleTracks(stateOwners).map(
-        ({ kind, label, language }) => ({ kind, label, language })
-      );
-    },
-    mediaEvents: ['loadstart'],
-    textTracksEvents: ['addtrack', 'removetrack'],
-  },
-  mediaSubtitlesShowing: {
-    get(stateOwners) {
-      return getShowingSubtitleTracks(stateOwners).map(
-        ({ kind, label, language }) => ({ kind, label, language })
-      );
-    },
-    mediaEvents: ['loadstart'],
-    textTracksEvents: ['addtrack', 'removetrack', 'change'],
-    stateOwnersUpdateHandlers: [
-      (_handler, stateOwners) => {
-        const { media, options } = stateOwners;
-        if (!media) return;
+  //     // Should this use `stateMediator.mediaSeekable.get(stateOwners)?.[1]` for separation
+  //     // of concerns/assumptions? (CJP)
+  //     const seekable = media.seekable;
+  //     // If the slotted media element is live but does not expose a 'seekable' `TimeRanges` object,
+  //     // always assume playing live
+  //     if (!seekable) return true;
+  //     // If there is an empty `seekable`, assume we are not playing live
+  //     if (!seekable.length) return false;
+  //     const liveEdgeStart = seekable.end(seekable.length - 1) - liveEdgeOffset;
+  //     return media.currentTime >= liveEdgeStart;
+  //   },
+  //   mediaEvents: ['playing', 'timeupdate', 'progress', 'waiting', 'emptied'],
+  // },
+  // // Text Tracks modeling
+  // mediaSubtitlesList: {
+  //   get(stateOwners) {
+  //     return getSubtitleTracks(stateOwners).map(
+  //       ({ kind, label, language }) => ({ kind, label, language })
+  //     );
+  //   },
+  //   mediaEvents: ['loadstart'],
+  //   textTracksEvents: ['addtrack', 'removetrack'],
+  // },
+  // mediaSubtitlesShowing: {
+  //   get(stateOwners) {
+  //     return getShowingSubtitleTracks(stateOwners).map(
+  //       ({ kind, label, language }) => ({ kind, label, language })
+  //     );
+  //   },
+  //   mediaEvents: ['loadstart'],
+  //   textTracksEvents: ['addtrack', 'removetrack', 'change'],
+  //   stateOwnersUpdateHandlers: [
+  //     (_handler, stateOwners) => {
+  //       const { media, options } = stateOwners;
+  //       if (!media) return;
 
-        const updateDefaultSubtitlesCallback = (event?: Event) => {
-          if (!options.defaultSubtitles) return;
+  //       const updateDefaultSubtitlesCallback = (event?: Event) => {
+  //         if (!options.defaultSubtitles) return;
 
-          const nonSubsEvent =
-            event &&
-            ![TextTrackKinds.CAPTIONS, TextTrackKinds.SUBTITLES].includes(
-              // @ts-ignore
-              event?.track?.kind
-            );
+  //         const nonSubsEvent =
+  //           event &&
+  //           ![TextTrackKinds.CAPTIONS, TextTrackKinds.SUBTITLES].includes(
+  //             // @ts-ignore
+  //             event?.track?.kind
+  //           );
 
-          if (nonSubsEvent) return;
+  //         if (nonSubsEvent) return;
 
-          // NOTE: In this use case, since we're causing a side effect, no need to invoke `handler()`. (CJP)
-          toggleSubtitleTracks(stateOwners, true);
-        };
+  //         // NOTE: In this use case, since we're causing a side effect, no need to invoke `handler()`. (CJP)
+  //         toggleSubtitleTracks(stateOwners, true);
+  //       };
 
-        media.addEventListener(
-          'loadstart',
-          updateDefaultSubtitlesCallback
-        );
-        media.textTracks?.addEventListener(
-          'addtrack',
-          updateDefaultSubtitlesCallback
-        );
-        media.textTracks?.addEventListener(
-          'removetrack',
-          updateDefaultSubtitlesCallback
-        );
+  //       media.addEventListener(
+  //         'loadstart',
+  //         updateDefaultSubtitlesCallback
+  //       );
+  //       media.textTracks?.addEventListener(
+  //         'addtrack',
+  //         updateDefaultSubtitlesCallback
+  //       );
+  //       media.textTracks?.addEventListener(
+  //         'removetrack',
+  //         updateDefaultSubtitlesCallback
+  //       );
 
-        return () => {
-          media.removeEventListener(
-            'loadstart',
-            updateDefaultSubtitlesCallback
-          );
-          media.textTracks?.removeEventListener(
-            'addtrack',
-            updateDefaultSubtitlesCallback
-          );
-          media.textTracks?.removeEventListener(
-            'removetrack',
-            updateDefaultSubtitlesCallback
-          );
-        };
-      },
-    ],
-  },
-  mediaChaptersCues: {
-    get(stateOwners: StateOwners) {
-      const { media } = stateOwners;
-      if (!media) return [];
+  //       return () => {
+  //         media.removeEventListener(
+  //           'loadstart',
+  //           updateDefaultSubtitlesCallback
+  //         );
+  //         media.textTracks?.removeEventListener(
+  //           'addtrack',
+  //           updateDefaultSubtitlesCallback
+  //         );
+  //         media.textTracks?.removeEventListener(
+  //           'removetrack',
+  //           updateDefaultSubtitlesCallback
+  //         );
+  //       };
+  //     },
+  //   ],
+  // },
+  // mediaChaptersCues: {
+  //   get(stateOwners: StateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media) return [];
 
-      const [chaptersTrack] = getTextTracksList(media as HTMLVideoElement, {
-        kind: TextTrackKinds.CHAPTERS,
-      });
+  //     const [chaptersTrack] = getTextTracksList(media as HTMLVideoElement, {
+  //       kind: TextTrackKinds.CHAPTERS,
+  //     });
 
-      return Array.from(chaptersTrack?.cues ?? []).map(
-        ({ text, startTime, endTime }: VTTCue) => ({
-          text,
-          startTime,
-          endTime,
-        })
-      );
-    },
-    mediaEvents: ['loadstart', 'loadedmetadata'],
-    textTracksEvents: ['addtrack', 'removetrack', 'change'],
-    stateOwnersUpdateHandlers: [
-      (handler, stateOwners) => {
-        const { media } = stateOwners;
-        if (!media) return;
+  //     return Array.from(chaptersTrack?.cues ?? []).map(
+  //       ({ text, startTime, endTime }: VTTCue) => ({
+  //         text,
+  //         startTime,
+  //         endTime,
+  //       })
+  //     );
+  //   },
+  //   mediaEvents: ['loadstart', 'loadedmetadata'],
+  //   textTracksEvents: ['addtrack', 'removetrack', 'change'],
+  //   stateOwnersUpdateHandlers: [
+  //     (handler, stateOwners) => {
+  //       const { media } = stateOwners;
+  //       if (!media) return;
 
-        /** @TODO account for adds/removes/replacements of <track> (CJP) */
-        const chaptersTrack = media.querySelector(
-          'track[kind="chapters"][default][src]'
-        );
+  //       /** @TODO account for adds/removes/replacements of <track> (CJP) */
+  //       const chaptersTrack = media.querySelector(
+  //         'track[kind="chapters"][default][src]'
+  //       );
 
-        /* If `media` is a custom media element search in its shadow DOM. */
-        const shadowChaptersTrack = media.shadowRoot?.querySelector(
-          ':is(video,audio) > track[kind="chapters"][default][src]'
-        );
+  //       /* If `media` is a custom media element search in its shadow DOM. */
+  //       const shadowChaptersTrack = media.shadowRoot?.querySelector(
+  //         ':is(video,audio) > track[kind="chapters"][default][src]'
+  //       );
 
-        /** @ts-ignore */
-        chaptersTrack?.addEventListener('load', handler);
-        /** @ts-ignore */
-        shadowChaptersTrack?.addEventListener('load', handler);
+  //       /** @ts-ignore */
+  //       chaptersTrack?.addEventListener('load', handler);
+  //       /** @ts-ignore */
+  //       shadowChaptersTrack?.addEventListener('load', handler);
 
-        return () => {
-          /** @ts-ignore */
-          chaptersTrack?.removeEventListener('load', handler);
-          /** @ts-ignore */
-          shadowChaptersTrack?.removeEventListener('load', handler);
-        };
-      },
-    ],
-  },
-  // Modeling state tied to root node
-  mediaIsPip: {
-    get(stateOwners) {
-      const { media, documentElement } = stateOwners;
+  //       return () => {
+  //         /** @ts-ignore */
+  //         chaptersTrack?.removeEventListener('load', handler);
+  //         /** @ts-ignore */
+  //         shadowChaptersTrack?.removeEventListener('load', handler);
+  //       };
+  //     },
+  //   ],
+  // },
+  // // Modeling state tied to root node
+  // mediaIsPip: {
+  //   get(stateOwners) {
+  //     const { media, documentElement } = stateOwners;
 
-      // Need a documentElement and a media StateOwner to be in PiP, so we're not PiP
-      if (!media || !documentElement) return false;
+  //     // Need a documentElement and a media StateOwner to be in PiP, so we're not PiP
+  //     if (!media || !documentElement) return false;
 
-      // Need a documentElement.pictureInPictureElement to be in PiP, so we're not PiP
-      if (!documentElement.pictureInPictureElement) return false;
+  //     // Need a documentElement.pictureInPictureElement to be in PiP, so we're not PiP
+  //     if (!documentElement.pictureInPictureElement) return false;
 
-      // If documentElement.pictureInPictureElement is the media StateOwner, we're definitely in PiP
-      if (documentElement.pictureInPictureElement === media) return true;
+  //     // If documentElement.pictureInPictureElement is the media StateOwner, we're definitely in PiP
+  //     if (documentElement.pictureInPictureElement === media) return true;
 
-      // In this case (e.g. Safari), the pictureInPictureElement may be
-      // the underlying <video> or <audio> element of a media StateOwner
-      // that is a web component, even if it's not "visible" from the
-      // documentElement, so check for that.
-      if (documentElement.pictureInPictureElement instanceof HTMLMediaElement) {
-        if (!media.localName?.includes('-')) return false;
-        return containsComposedNode(
-          media as Node,
-          documentElement.pictureInPictureElement
-        );
-      }
+  //     // In this case (e.g. Safari), the pictureInPictureElement may be
+  //     // the underlying <video> or <audio> element of a media StateOwner
+  //     // that is a web component, even if it's not "visible" from the
+  //     // documentElement, so check for that.
+  //     if (documentElement.pictureInPictureElement instanceof HTMLMediaElement) {
+  //       if (!media.localName?.includes('-')) return false;
+  //       return containsComposedNode(
+  //         media as Node,
+  //         documentElement.pictureInPictureElement
+  //       );
+  //     }
 
-      // In this case (e.g. Chrome), the pictureInPictureElement may be
-      // a web component that is "visible" from the documentElement, but should
-      // have its own pictureInPictureElement on its shadowRoot for whatever
-      // is "visible" at that level. Since the media StateOwner may be nested
-      // inside an indeterminite number of web components, traverse each layer
-      // until we either find the media StateOwner or complete the recursive check.
-      if (documentElement.pictureInPictureElement.localName.includes('-')) {
-        let currentRoot = documentElement.pictureInPictureElement.shadowRoot;
-        while (currentRoot?.pictureInPictureElement) {
-          if (currentRoot.pictureInPictureElement === media) return true;
-          currentRoot = currentRoot.pictureInPictureElement?.shadowRoot;
-        }
-      }
+  //     // In this case (e.g. Chrome), the pictureInPictureElement may be
+  //     // a web component that is "visible" from the documentElement, but should
+  //     // have its own pictureInPictureElement on its shadowRoot for whatever
+  //     // is "visible" at that level. Since the media StateOwner may be nested
+  //     // inside an indeterminite number of web components, traverse each layer
+  //     // until we either find the media StateOwner or complete the recursive check.
+  //     if (documentElement.pictureInPictureElement.localName.includes('-')) {
+  //       let currentRoot = documentElement.pictureInPictureElement.shadowRoot;
+  //       while (currentRoot?.pictureInPictureElement) {
+  //         if (currentRoot.pictureInPictureElement === media) return true;
+  //         currentRoot = currentRoot.pictureInPictureElement?.shadowRoot;
+  //       }
+  //     }
 
-      return false;
-    },
-    set(value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media) return;
-      if (value) {
-        if (!document.pictureInPictureEnabled) {
-          console.warn('MediaChrome: Picture-in-picture is not enabled');
-          // Placeholder for emitting a user-facing warning
-          return;
-        }
+  //     return false;
+  //   },
+  //   set(value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media) return;
+  //     if (value) {
+  //       if (!document.pictureInPictureEnabled) {
+  //         console.warn('MediaChrome: Picture-in-picture is not enabled');
+  //         // Placeholder for emitting a user-facing warning
+  //         return;
+  //       }
 
-        if (!media.requestPictureInPicture) {
-          console.warn(
-            'MediaChrome: The current media does not support picture-in-picture'
-          );
-          // Placeholder for emitting a user-facing warning
-          return;
-        }
-        const warnNotReady = () => {
-          console.warn(
-            'MediaChrome: The media is not ready for picture-in-picture. It must have a readyState > 0.'
-          );
-        };
+  //       if (!media.requestPictureInPicture) {
+  //         console.warn(
+  //           'MediaChrome: The current media does not support picture-in-picture'
+  //         );
+  //         // Placeholder for emitting a user-facing warning
+  //         return;
+  //       }
+  //       const warnNotReady = () => {
+  //         console.warn(
+  //           'MediaChrome: The media is not ready for picture-in-picture. It must have a readyState > 0.'
+  //         );
+  //       };
 
-        // Should be async
-        media.requestPictureInPicture().catch((err) => {
-          // InvalidStateError, readyState == 0 (Not ready)
-          if (err.code === 11) {
-            if (!media.src) {
-              console.warn(
-                'MediaChrome: The media is not ready for picture-in-picture. It must have a src set.'
-              );
-              return;
-            }
-            // We can assume the viewer wants the video to load, so attempt to
-            // if we can rely on readyState and preload
-            // Only works in Chrome currently. Safari doesn't allow triggering
-            // in an event listener. Also requires readyState == 4.
-            // Firefox doesn't have the PiP API yet.
-            if (media.readyState === 0 && media.preload === 'none') {
-              const cleanup = () => {
-                media.removeEventListener('loadedmetadata', tryPip);
-                media.preload = 'none';
-              };
+  //       // Should be async
+  //       media.requestPictureInPicture().catch((err) => {
+  //         // InvalidStateError, readyState == 0 (Not ready)
+  //         if (err.code === 11) {
+  //           if (!media.src) {
+  //             console.warn(
+  //               'MediaChrome: The media is not ready for picture-in-picture. It must have a src set.'
+  //             );
+  //             return;
+  //           }
+  //           // We can assume the viewer wants the video to load, so attempt to
+  //           // if we can rely on readyState and preload
+  //           // Only works in Chrome currently. Safari doesn't allow triggering
+  //           // in an event listener. Also requires readyState == 4.
+  //           // Firefox doesn't have the PiP API yet.
+  //           if (media.readyState === 0 && media.preload === 'none') {
+  //             const cleanup = () => {
+  //               media.removeEventListener('loadedmetadata', tryPip);
+  //               media.preload = 'none';
+  //             };
 
-              const tryPip = () => {
-                media.requestPictureInPicture().catch(warnNotReady);
-                cleanup();
-              };
+  //             const tryPip = () => {
+  //               media.requestPictureInPicture().catch(warnNotReady);
+  //               cleanup();
+  //             };
 
-              media.addEventListener('loadedmetadata', tryPip);
-              media.preload = 'metadata';
+  //             media.addEventListener('loadedmetadata', tryPip);
+  //             media.preload = 'metadata';
 
-              // No easy way to know if this failed and we should clean up
-              // quickly if it doesn't to prevent an awkward delay for the user
-              setTimeout(() => {
-                if (media.readyState === 0) warnNotReady();
-                cleanup();
-              }, 1000);
-            } else {
-              /** @TODO Should we actually rethrow? Feels like something we could log instead for improved devex (CJP) */
-              // Rethrow if unknown context
-              throw err;
-            }
-          } else {
-            /** @TODO Should we actually rethrow? Feels like something we could log instead for improved devex (CJP) */
-            // Rethrow if unknown context
-            throw err;
-          }
-        });
-      } else if (document.pictureInPictureElement) {
-        document.exitPictureInPicture();
-      }
-    },
-    mediaEvents: ['enterpictureinpicture', 'leavepictureinpicture'],
-  },
-  mediaRenditionList: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      // NOTE: Copying for reference considerations (should be an array of POJOs from a state perspective) (CJP)
-      return [...(media?.videoRenditions ?? [])].map((videoRendition) => ({
-        ...videoRendition,
-      }));
-    },
-    mediaEvents: ['emptied', 'loadstart'],
-    videoRenditionsEvents: ['addrendition', 'removerendition'],
-  },
-  /** @TODO Model this as a derived value? (CJP) */
-  mediaRenditionSelected: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      return media?.videoRenditions?.[media.videoRenditions?.selectedIndex]?.id;
-    },
-    set(value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media?.videoRenditions) {
-        console.warn(
-          'MediaController: Rendition selection not supported by this media.'
-        );
-        return;
-      }
+  //             // No easy way to know if this failed and we should clean up
+  //             // quickly if it doesn't to prevent an awkward delay for the user
+  //             setTimeout(() => {
+  //               if (media.readyState === 0) warnNotReady();
+  //               cleanup();
+  //             }, 1000);
+  //           } else {
+  //             /** @TODO Should we actually rethrow? Feels like something we could log instead for improved devex (CJP) */
+  //             // Rethrow if unknown context
+  //             throw err;
+  //           }
+  //         } else {
+  //           /** @TODO Should we actually rethrow? Feels like something we could log instead for improved devex (CJP) */
+  //           // Rethrow if unknown context
+  //           throw err;
+  //         }
+  //       });
+  //     } else if (document.pictureInPictureElement) {
+  //       document.exitPictureInPicture();
+  //     }
+  //   },
+  //   mediaEvents: ['enterpictureinpicture', 'leavepictureinpicture'],
+  // },
+  // mediaRenditionList: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     // NOTE: Copying for reference considerations (should be an array of POJOs from a state perspective) (CJP)
+  //     return [...(media?.videoRenditions ?? [])].map((videoRendition) => ({
+  //       ...videoRendition,
+  //     }));
+  //   },
+  //   mediaEvents: ['emptied', 'loadstart'],
+  //   videoRenditionsEvents: ['addrendition', 'removerendition'],
+  // },
+  // /** @TODO Model this as a derived value? (CJP) */
+  // mediaRenditionSelected: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     return media?.videoRenditions?.[media.videoRenditions?.selectedIndex]?.id;
+  //   },
+  //   set(value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media?.videoRenditions) {
+  //       console.warn(
+  //         'MediaController: Rendition selection not supported by this media.'
+  //       );
+  //       return;
+  //     }
 
-      const renditionId = value;
-      // NOTE: videoRenditions is an array-like, not an array (CJP)
-      const index = Array.prototype.findIndex.call(
-        media.videoRenditions,
-        (r) => r.id == renditionId
-      );
+  //     const renditionId = value;
+  //     // NOTE: videoRenditions is an array-like, not an array (CJP)
+  //     const index = Array.prototype.findIndex.call(
+  //       media.videoRenditions,
+  //       (r) => r.id == renditionId
+  //     );
 
-      if (media.videoRenditions.selectedIndex != index) {
-        media.videoRenditions.selectedIndex = index;
-      }
-    },
-    mediaEvents: ['emptied'],
-    videoRenditionsEvents: ['addrendition', 'removerendition', 'change'],
-  },
-  mediaAudioTrackList: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      return [...(media?.audioTracks ?? [])];
-    },
-    mediaEvents: ['emptied', 'loadstart'],
-    audioTracksEvents: ['addtrack', 'removetrack'],
-  },
-  mediaAudioTrackEnabled: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      return [...(media?.audioTracks ?? [])].find(
-        (audioTrack) => audioTrack.enabled
-      )?.id;
-    },
-    set(value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media?.audioTracks) {
-        console.warn(
-          'MediaChrome: Audio track selection not supported by this media.'
-        );
-        return;
-      }
+  //     if (media.videoRenditions.selectedIndex != index) {
+  //       media.videoRenditions.selectedIndex = index;
+  //     }
+  //   },
+  //   mediaEvents: ['emptied'],
+  //   videoRenditionsEvents: ['addrendition', 'removerendition', 'change'],
+  // },
+  // mediaAudioTrackList: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     return [...(media?.audioTracks ?? [])];
+  //   },
+  //   mediaEvents: ['emptied', 'loadstart'],
+  //   audioTracksEvents: ['addtrack', 'removetrack'],
+  // },
+  // mediaAudioTrackEnabled: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     return [...(media?.audioTracks ?? [])].find(
+  //       (audioTrack) => audioTrack.enabled
+  //     )?.id;
+  //   },
+  //   set(value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media?.audioTracks) {
+  //       console.warn(
+  //         'MediaChrome: Audio track selection not supported by this media.'
+  //       );
+  //       return;
+  //     }
 
-      const audioTrackId = value;
+  //     const audioTrackId = value;
 
-      for (const track of media.audioTracks) {
-        track.enabled = audioTrackId == track.id;
-      }
-    },
-    mediaEvents: ['emptied'],
-    audioTracksEvents: ['addtrack', 'removetrack', 'change'],
-  },
-  mediaIsFullscreen: {
-    get(stateOwners) {
-      return isFullscreen(stateOwners);
-    },
-    set(value, stateOwners) {
-      if (!value) {
-        exitFullscreen(stateOwners);
-      } else {
-        enterFullscreen(stateOwners);
-      }
-    },
-    // older Safari version may require webkit-specific events
-    rootEvents: ['fullscreenchange', 'webkitfullscreenchange'],
-    // iOS requires webkit-specific events on the video.
-    mediaEvents: [
-      'webkitbeginfullscreen',
-      'webkitendfullscreen',
-      'webkitpresentationmodechanged',
-    ],
-  },
-  mediaIsCasting: {
-    // Note this relies on a customized castable-video element.
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     for (const track of media.audioTracks) {
+  //       track.enabled = audioTrackId == track.id;
+  //     }
+  //   },
+  //   mediaEvents: ['emptied'],
+  //   audioTracksEvents: ['addtrack', 'removetrack', 'change'],
+  // },
+  // mediaIsFullscreen: {
+  //   get(stateOwners) {
+  //     return isFullscreen(stateOwners);
+  //   },
+  //   set(value, stateOwners) {
+  //     if (!value) {
+  //       exitFullscreen(stateOwners);
+  //     } else {
+  //       enterFullscreen(stateOwners);
+  //     }
+  //   },
+  //   // older Safari version may require webkit-specific events
+  //   rootEvents: ['fullscreenchange', 'webkitfullscreenchange'],
+  //   // iOS requires webkit-specific events on the video.
+  //   mediaEvents: [
+  //     'webkitbeginfullscreen',
+  //     'webkitendfullscreen',
+  //     'webkitpresentationmodechanged',
+  //   ],
+  // },
+  // mediaIsCasting: {
+  //   // Note this relies on a customized castable-video element.
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      if (!media?.remote || media.remote?.state === 'disconnected')
-        return false;
+  //     if (!media?.remote || media.remote?.state === 'disconnected')
+  //       return false;
 
-      return !!media.remote.state;
-    },
-    set(value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media) return;
-      if (value && media.remote?.state !== 'disconnected') return;
-      if (!value && media.remote?.state !== 'connected') return;
+  //     return !!media.remote.state;
+  //   },
+  //   set(value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media) return;
+  //     if (value && media.remote?.state !== 'disconnected') return;
+  //     if (!value && media.remote?.state !== 'connected') return;
 
-      if (typeof media.remote.prompt !== 'function') {
-        console.warn(
-          'MediaChrome: Casting is not supported in this environment'
-        );
-        return;
-      }
+  //     if (typeof media.remote.prompt !== 'function') {
+  //       console.warn(
+  //         'MediaChrome: Casting is not supported in this environment'
+  //       );
+  //       return;
+  //     }
 
-      // Open the browser cast menu.
-      // Note this relies on a customized castable-video element.
-      media.remote
-        .prompt()
-        // Don't warn here because catch is run when the user closes the cast menu.
-        .catch(() => {});
-    },
-    remoteEvents: ['connect', 'connecting', 'disconnect'],
-  },
-  // NOTE: Newly added state for tracking airplaying
-  mediaIsAirplaying: {
-    // NOTE: Cannot know if airplaying since Safari doesn't fully support HTMLMediaElement::remote yet (e.g. remote::state) (CJP)
-    get() {
-      return false;
-    },
-    set(_value, stateOwners) {
-      const { media } = stateOwners;
-      if (!media) return;
-      if (
-        !(
-          media.webkitShowPlaybackTargetPicker &&
-          globalThis.WebKitPlaybackTargetAvailabilityEvent
-        )
-      ) {
-        console.error(
-          'MediaChrome: received a request to select AirPlay but AirPlay is not supported in this environment'
-        );
-        return;
-      }
-      media.webkitShowPlaybackTargetPicker();
-    },
-    mediaEvents: ['webkitcurrentplaybacktargetiswirelesschanged'],
-  },
-  mediaFullscreenUnavailable: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      if (
-        !fullscreenSupported ||
-        !hasFullscreenSupport(media as HTMLVideoElement)
-      )
-        return AvailabilityStates.UNSUPPORTED;
-      return undefined;
-    },
-  },
-  mediaPipUnavailable: {
-    get(stateOwners) {
-      const { media } = stateOwners;
-      if (!pipSupported || !hasPipSupport(media as HTMLVideoElement))
-        return AvailabilityStates.UNSUPPORTED;
-    },
-  },
-  mediaVolumeUnavailable: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     // Open the browser cast menu.
+  //     // Note this relies on a customized castable-video element.
+  //     media.remote
+  //       .prompt()
+  //       // Don't warn here because catch is run when the user closes the cast menu.
+  //       .catch(() => {});
+  //   },
+  //   remoteEvents: ['connect', 'connecting', 'disconnect'],
+  // },
+  // // NOTE: Newly added state for tracking airplaying
+  // mediaIsAirplaying: {
+  //   // NOTE: Cannot know if airplaying since Safari doesn't fully support HTMLMediaElement::remote yet (e.g. remote::state) (CJP)
+  //   get() {
+  //     return false;
+  //   },
+  //   set(_value, stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!media) return;
+  //     if (
+  //       !(
+  //         media.webkitShowPlaybackTargetPicker &&
+  //         globalThis.WebKitPlaybackTargetAvailabilityEvent
+  //       )
+  //     ) {
+  //       console.error(
+  //         'MediaChrome: received a request to select AirPlay but AirPlay is not supported in this environment'
+  //       );
+  //       return;
+  //     }
+  //     media.webkitShowPlaybackTargetPicker();
+  //   },
+  //   mediaEvents: ['webkitcurrentplaybacktargetiswirelesschanged'],
+  // },
+  // mediaFullscreenUnavailable: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (
+  //       !fullscreenSupported ||
+  //       !hasFullscreenSupport(media as HTMLVideoElement)
+  //     )
+  //       return AvailabilityStates.UNSUPPORTED;
+  //     return undefined;
+  //   },
+  // },
+  // mediaPipUnavailable: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
+  //     if (!pipSupported || !hasPipSupport(media as HTMLVideoElement))
+  //       return AvailabilityStates.UNSUPPORTED;
+  //   },
+  // },
+  // mediaVolumeUnavailable: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      if (volumeSupported === false || media?.volume == undefined) {
-        return AvailabilityStates.UNSUPPORTED;
-      }
+  //     if (volumeSupported === false || media?.volume == undefined) {
+  //       return AvailabilityStates.UNSUPPORTED;
+  //     }
 
-      return undefined;
-    },
-    // NOTE: Slightly different impl here. Added generic support for
-    // "stateOwnersUpdateHandlers" since the original impl had to hack around
-    // race conditions. (CJP)
-    stateOwnersUpdateHandlers: [
-      (handler) => {
-        if (volumeSupported == null) {
-          volumeSupportPromise.then((supported) =>
-            handler(supported ? undefined : AvailabilityStates.UNSUPPORTED)
-          );
-        }
-      },
-    ],
-  },
-  mediaCastUnavailable: {
-    // @ts-ignore
-    get(stateOwners, { availability = 'not-available' } = {}) {
-      const { media } = stateOwners;
+  //     return undefined;
+  //   },
+  //   // NOTE: Slightly different impl here. Added generic support for
+  //   // "stateOwnersUpdateHandlers" since the original impl had to hack around
+  //   // race conditions. (CJP)
+  //   stateOwnersUpdateHandlers: [
+  //     (handler) => {
+  //       if (volumeSupported == null) {
+  //         volumeSupportPromise.then((supported) =>
+  //           handler(supported ? undefined : AvailabilityStates.UNSUPPORTED)
+  //         );
+  //       }
+  //     },
+  //   ],
+  // },
+  // mediaCastUnavailable: {
+  //   // @ts-ignore
+  //   get(stateOwners, { availability = 'not-available' } = {}) {
+  //     const { media } = stateOwners;
 
-      if (!castSupported || !media?.remote?.state) {
-        return AvailabilityStates.UNSUPPORTED;
-      }
+  //     if (!castSupported || !media?.remote?.state) {
+  //       return AvailabilityStates.UNSUPPORTED;
+  //     }
 
-      if (availability == null || availability === 'available')
-        return undefined;
+  //     if (availability == null || availability === 'available')
+  //       return undefined;
 
-      return AvailabilityStates.UNAVAILABLE;
-    },
-    stateOwnersUpdateHandlers: [
-      (handler, stateOwners) => {
-        const { media } = stateOwners;
-        if (!media) return;
+  //     return AvailabilityStates.UNAVAILABLE;
+  //   },
+  //   stateOwnersUpdateHandlers: [
+  //     (handler, stateOwners) => {
+  //       const { media } = stateOwners;
+  //       if (!media) return;
 
-        const remotePlaybackDisabled =
-          media.disableRemotePlayback ||
-          media.hasAttribute('disableremoteplayback');
-        if (!remotePlaybackDisabled) {
-          media?.remote
-            ?.watchAvailability((availabilityBool) => {
-              // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
-              const availability = availabilityBool
-                ? 'available'
-                : 'not-available';
-              // @ts-ignore
-              handler({ availability });
-            })
-            .catch((error) => {
-              if (error.name === 'NotSupportedError') {
-                // Availability monitoring is not supported by the platform, so discovery of
-                // remote playback devices will happen only after remote.prompt() is called.
-                // @ts-ignore
-                handler({ availability: null });
-              } else {
-                // Thrown if disableRemotePlayback is true for the media element
-                // or if the source can't be played remotely.
-                // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
-                // @ts-ignore
-                handler({ availability: 'not-available' });
-              }
-            });
-        }
-        return () => {
-          media?.remote?.cancelWatchAvailability().catch(() => {});
-        };
-      },
-    ],
-  },
-  mediaAirplayUnavailable: {
-    get(_stateOwners, event) {
-      if (!airplaySupported) return AvailabilityStates.UNSUPPORTED;
-      // @ts-ignore
-      if (event?.availability === 'not-available') {
-        return AvailabilityStates.UNAVAILABLE;
-      }
-      // Either available via `availability` state or not yet known
-      return undefined;
-    },
-    // NOTE: Keeping this event, as it's still the documented way of monitoring
-    // for AirPlay availability from Apple.
-    // See: https://developer.apple.com/documentation/webkitjs/adding_an_airplay_button_to_your_safari_media_controls#2940021 (CJP)
-    mediaEvents: ['webkitplaybacktargetavailabilitychanged'],
-    stateOwnersUpdateHandlers: [
-      (handler, stateOwners) => {
-        const { media } = stateOwners;
-        if (!media) return;
+  //       const remotePlaybackDisabled =
+  //         media.disableRemotePlayback ||
+  //         media.hasAttribute('disableremoteplayback');
+  //       if (!remotePlaybackDisabled) {
+  //         media?.remote
+  //           ?.watchAvailability((availabilityBool) => {
+  //             // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
+  //             const availability = availabilityBool
+  //               ? 'available'
+  //               : 'not-available';
+  //             // @ts-ignore
+  //             handler({ availability });
+  //           })
+  //           .catch((error) => {
+  //             if (error.name === 'NotSupportedError') {
+  //               // Availability monitoring is not supported by the platform, so discovery of
+  //               // remote playback devices will happen only after remote.prompt() is called.
+  //               // @ts-ignore
+  //               handler({ availability: null });
+  //             } else {
+  //               // Thrown if disableRemotePlayback is true for the media element
+  //               // or if the source can't be played remotely.
+  //               // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
+  //               // @ts-ignore
+  //               handler({ availability: 'not-available' });
+  //             }
+  //           });
+  //       }
+  //       return () => {
+  //         media?.remote?.cancelWatchAvailability().catch(() => {});
+  //       };
+  //     },
+  //   ],
+  // },
+  // mediaAirplayUnavailable: {
+  //   get(_stateOwners, event) {
+  //     if (!airplaySupported) return AvailabilityStates.UNSUPPORTED;
+  //     // @ts-ignore
+  //     if (event?.availability === 'not-available') {
+  //       return AvailabilityStates.UNAVAILABLE;
+  //     }
+  //     // Either available via `availability` state or not yet known
+  //     return undefined;
+  //   },
+  //   // NOTE: Keeping this event, as it's still the documented way of monitoring
+  //   // for AirPlay availability from Apple.
+  //   // See: https://developer.apple.com/documentation/webkitjs/adding_an_airplay_button_to_your_safari_media_controls#2940021 (CJP)
+  //   mediaEvents: ['webkitplaybacktargetavailabilitychanged'],
+  //   stateOwnersUpdateHandlers: [
+  //     (handler, stateOwners) => {
+  //       const { media } = stateOwners;
+  //       if (!media) return;
 
-        const remotePlaybackDisabled =
-          media.disableRemotePlayback ||
-          media.hasAttribute('disableremoteplayback');
-        if (!remotePlaybackDisabled) {
-          media?.remote
-            ?.watchAvailability((availabilityBool) => {
-              // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
-              const availability = availabilityBool
-                ? 'available'
-                : 'not-available';
-              // @ts-ignore
-              handler({ availability });
-            })
-            .catch((error) => {
-              if (error.name === 'NotSupportedError') {
-                // Availability monitoring is not supported by the platform, so discovery of
-                // remote playback devices will happen only after remote.prompt() is called.
-                // @ts-ignore
-                handler({ availability: null });
-              } else {
-                // Thrown if disableRemotePlayback is true for the media element
-                // or if the source can't be played remotely.
-                // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
-                // @ts-ignore
-                handler({ availability: 'not-available' });
-              }
-            });
-        }
-        return () => {
-          media?.remote?.cancelWatchAvailability().catch(() => {});
-        };
-      },
-    ],
-  },
-  mediaRenditionUnavailable: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //       const remotePlaybackDisabled =
+  //         media.disableRemotePlayback ||
+  //         media.hasAttribute('disableremoteplayback');
+  //       if (!remotePlaybackDisabled) {
+  //         media?.remote
+  //           ?.watchAvailability((availabilityBool) => {
+  //             // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
+  //             const availability = availabilityBool
+  //               ? 'available'
+  //               : 'not-available';
+  //             // @ts-ignore
+  //             handler({ availability });
+  //           })
+  //           .catch((error) => {
+  //             if (error.name === 'NotSupportedError') {
+  //               // Availability monitoring is not supported by the platform, so discovery of
+  //               // remote playback devices will happen only after remote.prompt() is called.
+  //               // @ts-ignore
+  //               handler({ availability: null });
+  //             } else {
+  //               // Thrown if disableRemotePlayback is true for the media element
+  //               // or if the source can't be played remotely.
+  //               // Normalizing to `webkitplaybacktargetavailabilitychanged` for consistency.
+  //               // @ts-ignore
+  //               handler({ availability: 'not-available' });
+  //             }
+  //           });
+  //       }
+  //       return () => {
+  //         media?.remote?.cancelWatchAvailability().catch(() => {});
+  //       };
+  //     },
+  //   ],
+  // },
+  // mediaRenditionUnavailable: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      if (!media?.videoRenditions) {
-        return AvailabilityStates.UNSUPPORTED;
-      }
+  //     if (!media?.videoRenditions) {
+  //       return AvailabilityStates.UNSUPPORTED;
+  //     }
 
-      if (!media.videoRenditions?.length) {
-        return AvailabilityStates.UNAVAILABLE;
-      }
+  //     if (!media.videoRenditions?.length) {
+  //       return AvailabilityStates.UNAVAILABLE;
+  //     }
 
-      return undefined;
-    },
-    mediaEvents: ['emptied', 'loadstart'],
-    videoRenditionsEvents: ['addrendition', 'removerendition'],
-  },
-  mediaAudioTrackUnavailable: {
-    get(stateOwners) {
-      const { media } = stateOwners;
+  //     return undefined;
+  //   },
+  //   mediaEvents: ['emptied', 'loadstart'],
+  //   videoRenditionsEvents: ['addrendition', 'removerendition'],
+  // },
+  // mediaAudioTrackUnavailable: {
+  //   get(stateOwners) {
+  //     const { media } = stateOwners;
 
-      if (!media?.audioTracks) {
-        return AvailabilityStates.UNSUPPORTED;
-      }
+  //     if (!media?.audioTracks) {
+  //       return AvailabilityStates.UNSUPPORTED;
+  //     }
 
-      // An audio selection is only possible if there are 2 or more audio tracks.
-      if ((media.audioTracks?.length ?? 0) <= 1) {
-        return AvailabilityStates.UNAVAILABLE;
-      }
+  //     // An audio selection is only possible if there are 2 or more audio tracks.
+  //     if ((media.audioTracks?.length ?? 0) <= 1) {
+  //       return AvailabilityStates.UNAVAILABLE;
+  //     }
 
-      return undefined;
-    },
-    mediaEvents: ['emptied', 'loadstart'],
-    audioTracksEvents: ['addtrack', 'removetrack'],
-  },
+  //     return undefined;
+  //   },
+  //   mediaEvents: ['emptied', 'loadstart'],
+  //   audioTracksEvents: ['addtrack', 'removetrack'],
+  // },
 };
