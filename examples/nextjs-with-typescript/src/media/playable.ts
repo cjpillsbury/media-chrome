@@ -111,3 +111,5 @@ export class PlayableMediaStateOwner
     }
   }
 }
+
+export const createMediaStateOwner = () => new PlayableMediaStateOwner();

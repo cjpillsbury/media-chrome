@@ -51,6 +51,8 @@ export { MediaState };
 
 export { AvailabilityStates, StreamTypes, VolumeLevels };
 
+export { createMediaStore };
+
 const {
   REGISTER_MEDIA_STATE_RECEIVER, // eslint-disable-line
   UNREGISTER_MEDIA_STATE_RECEIVER, // eslint-disable-line
@@ -69,6 +71,8 @@ export const MediaActionTypes = {
 export const MediaStateNames = { ...MediaUIProps } as const;
 
 const identity = (x?: any) => x;
+
+const DEFAULT_CREATE_MEDIA_STORE = createMediaStore;
 
 /**
  * @description The {@link https://react.dev/learn/passing-data-deeply-with-context#context-an-alternative-to-passing-props|React Context}
@@ -127,9 +131,11 @@ export const MediaContext: Context<MediaStore | null> =
 export const MediaProvider = ({
   children,
   mediaStore,
+  createMediaStore = DEFAULT_CREATE_MEDIA_STORE,
 }: {
   children: ReactNode;
   mediaStore?: MediaStore;
+  createMediaStore?: typeof DEFAULT_CREATE_MEDIA_STORE;
 }) => {
   const value = useMemo(
     () =>

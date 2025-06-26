@@ -13,7 +13,38 @@ import {
 /** @TODO Improve types crud (CJP) */
 import type { useMediaRef } from 'media-chrome/react/media-store';
 import ConnectedComponent from '../connected/Video';
-import { PlayableMediaStateOwner } from '@/media/playable';
+import { createMediaStateOwner } from '@/media/playable';
+
+// These are the first steps/WIP POC of decoupling the Media State Owner from the DOM.
+// Note that everything will still work if you use:
+// 1. an audio/video element directly
+// 2. a custom element a la media-elements
+type CreateMediaStateOwner = typeof createMediaStateOwner;
+const useMediaStateOwner = (
+  ref: Ref<MediaStateOwner>,
+  createMediaStateOwner: CreateMediaStateOwner /*, props? */
+) => {
+  const mediaStateOwnerRef = useRef(createMediaStateOwner(/* props? */));
+  useImperativeHandle(ref, () => mediaStateOwnerRef.current, []);
+  /** @TODO Parameterize this (CJP) */
+  type ComponentProps = DetailedHTMLProps<
+    VideoHTMLAttributes<HTMLVideoElement>,
+    HTMLVideoElement
+  >;
+  return {
+    updateMediaElement(
+      mediaEl: HTMLMediaElement | null,
+      props: ComponentProps
+    ) {
+      // NOTE: The details here will almost definitely change for a less "bare bones"/"POC" implementation of Media State Owner impl. (CJP)
+      mediaStateOwnerRef.current.mediaElement = mediaEl ?? undefined;
+      mediaStateOwnerRef.current.src = props.src as string;
+      if (props.muted) {
+        mediaStateOwnerRef.current.muted = props.muted;
+      }
+    },
+  };
+};
 
 type MediaStateOwner = NonNullable<
   Parameters<ReturnType<typeof useMediaRef>>[0]
@@ -25,17 +56,12 @@ const BaseComponent: ElementType<
     'ref'
   > & { ref: Ref<MediaStateOwner> }
 > = ({ children, ref, ...props }) => {
-  const mediaStateOwnerRef = useRef(new PlayableMediaStateOwner());
-  useImperativeHandle(ref, () => mediaStateOwnerRef.current, []);
+  const { updateMediaElement } = useMediaStateOwner(ref, createMediaStateOwner);
   return (
     <video
       ref={(mediaEl) => {
-        // NOTE: The details here will almost definitely change for a less "bare bones"/"POC" implementation of Media State Owner impl. (CJP)
-        mediaStateOwnerRef.current.mediaElement = mediaEl ?? undefined;
-        mediaStateOwnerRef.current.src = props.src as string;
-        if (props.muted) {
-            mediaStateOwnerRef.current.muted = props.muted;
-        }
+        /** @TODO In later iterations/non-POC, we should be able to have a function that can be used directly for the `ref` prop (CJP) */
+        updateMediaElement(mediaEl, props);
       }}
     >
       {children}

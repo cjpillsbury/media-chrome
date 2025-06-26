@@ -1,6 +1,6 @@
 'use client';
 /** @TODO !!! Revisit for SSR (CJP) */
-import { MediaProvider } from 'media-chrome/react/media-store';
+import { MediaProvider, createMediaStore } from 'media-chrome/react/media-store';
 import {
   DetailedHTMLProps,
   PropsWithChildren,
@@ -9,7 +9,7 @@ import {
 
 type PlayerProps = PropsWithChildren<
   DetailedHTMLProps<VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>
->;
+> & { createMediaStore?: typeof createMediaStore };
 
 /**
  * @description This is the fully-packaged "media player" with UI that uses Material UI for all of its "chrome"/UI components.
@@ -17,7 +17,7 @@ type PlayerProps = PropsWithChildren<
  * @returns A player react component instance
  */
 const Player = (props: PlayerProps) => {
-  const { children } = props;
+  const { children, createMediaStore } = props;
   return (
     /**
      * <MediaProvider/> is a {@link https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context|React Context.Provider} for
@@ -28,7 +28,7 @@ const Player = (props: PlayerProps) => {
      * their own <MediaProvider/> to manage the media state + UI for *that player instance*.
      *
      */
-    <MediaProvider>{children}</MediaProvider>
+    <MediaProvider createMediaStore={createMediaStore}>{children}</MediaProvider>
   );
 };
 
