@@ -1,0 +1,15 @@
+.Root {
+  color: white;
+  padding: 8px;
+  background-color: black;
+
+  .PlayIcon,
+  .PauseIcon {
+    width: 24px;
+    height: 24px;
+  }
+  &:not([data-paused]) .PlayIcon,
+  &[data-paused] .PauseIcon {
+    display: none;
+  }
+}

@@ -1,0 +1,38 @@
+.Root {
+  position: relative;
+  background-color: black;
+  width: 80vw;
+  /* aspect-ratio: 16/9; */
+  overflow: hidden;
+
+  .ControlsLayer {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    opacity: 0;
+    background: linear-gradient(to top, rgb(0, 0, 0, 0.5), transparent);
+    &:hover {
+      opacity: 1;
+    }
+    &:focus-within {
+      opacity: 1;
+    }
+
+    .Spacer {
+      flex-grow: 1;
+    }
+  }
+
+  &[data-paused] .ControlsLayer {
+    opacity: 1;
+  }
+}
+
+.ControlBar {
+  display: flex;
+  flex-direction: row;
+}

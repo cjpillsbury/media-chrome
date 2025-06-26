@@ -1,0 +1,18 @@
+.Root {
+  color: white;
+  padding: 8px;
+  background-color: black;
+
+  .VolumeOffIcon,
+  .VolumeLowIcon,
+  .VolumeHighIcon {
+    width: 24px;
+    height: 24px;
+  }
+  &:not([data-volume-level='off']) .VolumeOffIcon,
+  &:not(:is([data-volume-level='low'], [data-volume-level='medium']))
+    .VolumeLowIcon,
+  &:not([data-volume-level='high']) .VolumeHighIcon {
+    display: none;
+  }
+}
